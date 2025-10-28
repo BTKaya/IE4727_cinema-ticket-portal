@@ -1,0 +1,600 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+:root {
+  --header-h: 70px;
+  --text: #ffffff;
+  --dim: #888;
+  --bg: #000;
+  --bg2: #111;
+  --accent: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
+}
+
+/* ================= HEADER ================= */
+.templates-header {
+  height: var(--header-h);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg2);
+  color: var(--text);
+  padding: 0 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.templates-header a {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+  transition: .2s;
+}
+
+.templates-header a:hover {
+  color: var(--accent);
+}
+
+/* ================= HERO / SLIDESHOW ================= */
+.hero-wrap {
+  position: relative;
+  height: calc(100vh - var(--header-h));
+  width: 100%;
+  margin-top: var(--header-h);
+  overflow: hidden;
+}
+
+.carousel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* === FADE SLIDESHOW IMAGES === */
+.slideshow-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  animation: fadeSlideshow 18s infinite;
+  z-index: 1;
+}
+
+/* Fade timing for 3 slides (adjustable if you tell me total count) */
+.slideshow-image:nth-child(1) { animation-delay: 0s; }
+.slideshow-image:nth-child(2) { animation-delay: 6s; }
+.slideshow-image:nth-child(3) { animation-delay: 12s; }
+
+/* Smooth fade animation */
+@keyframes fadeSlideshow {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  30%  { opacity: 1; }
+  40%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+
+
+/* OPTIONAL DARK FADE FOR READABILITY */
+.hero-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,.85), rgba(0,0,0,0) 60%);
+  z-index: 2;
+}
+
+/* ================= MOVIE LIST BOTTOM LEFT ================= */
+.popular-list {
+  position: absolute;
+  bottom: 10%;
+  left: 4%;
+  z-index: 3;
+}
+
+.popular-list ul {
+  list-style: none;
+}
+
+.movie-name {
+  display: inline-block;
+  font-size: calc(18px + 2vw);
+  font-weight: 600;
+  color: white;
+  text-decoration: none;
+  margin-bottom: 0.6rem;
+  transition: transform .35s ease, color .35s ease;
+  position: relative;
+  transform-origin: left center;
+
+}
+
+/* Only the animated underline */
+.movie-name::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;   /* ✅ moved closer (was -6) */
+  left: 0;
+  width: 0%;
+  height: 2px;    /* ✅ thinner, cleaner */
+  background: currentColor;
+  transition: width .35s ease;
+}
+
+.movie-name:hover {
+  transform: scale(1.5);
+  color: white;
+}
+
+.movie-name:hover::after {
+  width: 100%;
+}
+
+/* ================= SUMMARY BOX ================= */
+.movie-summary-box {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  width: 380px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  padding: 24px 28px;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity .35s ease, transform .45s ease;
+  pointer-events: none;
+  color: white;
+  z-index: 4;
+}
+
+.movie-summary-box.visible {
+  opacity: 1;
+  transform: translateY(-50%) translateY(0); /* stays centered, no vertical slide offset */
+}
+
+.movie-summary-box h3 {
+  margin-bottom: 0.6rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.movie-summary-box p {
+  line-height: 1.35;
+  font-size: 1rem;
+  color: #e6e6e6;
+}
+
+/* ================= MOVIE GRID UNDER SLIDESHOW ================= */
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 3rem;
+  margin-top: 2rem;
+}
+
+.movie-card {
+  text-align: center;
+  cursor: pointer;
+}
+
+.movie-card img {
+  width: 100%;
+  border-radius: 10px;
+  transition: transform .35s;
+}
+
+.movie-card:hover img {
+  transform: scale(1.08);
+}
+
+.movie-card h3 {
+  margin-top: 0.5rem;
+  color: white;
+}
+
+/* ================= FOOTER ================= */
+.site-footer {
+  text-align: center;
+  padding: 1.2rem;
+  background: var(--bg2);
+  margin-top: 2rem;
+  color: var(--dim);
+}
+
+/* =============================================
+   MOVIE PAGE - ISOLATION FROM HOMEPAGE LAYOUT
+   ============================================= */
+.movie-page {
+  margin-top: var(--header-h);
+  padding: 2rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #000; /* ensures no slideshow gradient shows through */
+  color: white;
+  position: relative;
+  z-index: 10; /* always above slideshow visuals */
+}
+
+/* ensures nothing tries to align like the hero */
+.movie-page * {
+  position: relative;
+  z-index: 10;
+}
+
+/* restore seat map display */
+.seat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.row-label {
+  width: 20px;
+  margin-right: 10px;
+  text-align: right;
+}
+
+.aisle-gap {
+  width: 16px;
+  display: inline-block;
+}
+
+.movie-page {
+  margin-top: var(--header-h);
+  padding: 2rem;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  color: white;
+}
+
+.movie-info {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.movie-info img {
+  width: 220px;
+  border-radius: 10px;
+}
+
+.movie-info p {
+  flex: 1;
+  line-height: 1.5;
+}
+
+/* ===== CART PAGE ===== */
+.cart-page {
+  margin-top: var(--header-h);
+  padding: 2.5rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  color: white;
+}
+
+.cart-page h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.empty-cart {
+  text-align: center;
+  opacity: 0.7;
+  margin-top: 2rem;
+}
+
+/* Booking Cards */
+.booking-card {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 1.5rem 1.8rem;
+  margin-bottom: 1.8rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+  transition: transform .25s ease, border-color .25s ease;
+}
+
+.booking-card:hover {
+  transform: translateY(-4px);
+  border-color: #888;
+}
+
+/* Total Price */
+.booking-card .price {
+  margin-top: 8px;
+  font-size: 1.1rem;
+}
+
+/* Remove Booking Button */
+.remove-btn {
+  margin-top: 1rem;
+  background: #b23434;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .25s;
+}
+
+.remove-btn:hover {
+  background: #d24a4a;
+}
+
+/* Checkout Button */
+.confirm-checkout-wrap {
+  text-align: center;
+  margin-top: 2.2rem;
+}
+
+.checkout-btn {
+  background: #ffffff20;
+  border: 2px solid #ffffff50;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  color: white;
+  text-decoration: none;
+  transition: background .3s, border-color .3s, transform .3s;
+}
+
+.checkout-btn:hover {
+  background: #ffffff35;
+  border-color: white;
+  transform: translateY(-3px);
+}
+
+
+/* ================= CONFIRM BUTTON STYLING ================= */
+.confirm-btn {
+  background: #ffffff10;
+  border: 2px solid #ffffff50;
+  color: white;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  display: inline-block;
+  transition: background .25s ease, border-color .25s ease, transform .25s ease;
+}
+
+.confirm-btn:hover {
+  background: #ffffff25;
+  border-color: #ffffff90;
+  transform: translateY(-2px);
+}
+
+.confirm-btn:active {
+  background: #ffffff35;
+  transform: translateY(0);
+}
+
+/* ================= SEAT MAP ================= */
+.seat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.row-label {
+  width: 20px;
+  margin-right: 12px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.seat {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  border: none;
+  background: #333;
+  display: inline-block;
+}
+
+.seat.available {
+  background: linear-gradient(145deg, #3ea34c, #2a6f34);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.seat.selected {
+  background: linear-gradient(145deg, #f5e14a, #c9b12e);
+  box-shadow: 0 2px 8px rgba(255,255,120,0.5);
+  transform: scale(1.15);
+}
+
+.seat.booked {
+  background: linear-gradient(145deg, #b23434, #7d1e1e);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.seat.available:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+}
+
+.aisle-gap {
+  width: 24px;
+  display: inline-block;
+}
+
+.seat-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.8rem;
+  margin: 1.5rem 0;
+  font-size: 1rem;
+  color: white;
+}
+
+/* Legend seats should not react like real seats */
+.seat.static {
+  pointer-events: none;       /* cannot click */
+  transform: none !important; /* no scaling */
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* Prevent hover effects on legend seats */
+.seat.static:hover {
+  transform: none !important;
+}
+
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== "SCREEN" Label ===== */
+.screen-label {
+  text-align: center;
+  font-size: 1.1rem;
+  letter-spacing: 6px;
+  margin: 1.5rem 0 1.5rem 0;
+  padding-bottom: 0.5rem;
+  color: #bbb;
+  position: relative;
+}
+
+.screen-label::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -8px;
+  width: 65%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #666, transparent);
+}
+
+
+/* ===== Center Confirm Button Under Seat Map ===== */
+.confirm-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+/* ===== Confirm Button Styling (Dark Cinematic Theme) ===== */
+.confirm-btn {
+  background: #ffffff15;
+  border: 2px solid #ffffff44;
+  color: #ffffff;
+  padding: 14px 36px;
+  border-radius: 8px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.confirm-btn:hover {
+  background: #ffffff25;
+  border-color: #ffffffaa;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 14px rgba(255,255,255,0.18);
+}
+
+.confirm-btn:active {
+  transform: translateY(0);
+  background: #ffffff35;
+}
+
+/* ===== Date + Time Selection Styling ===== */
+.datetime-select {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+  margin: 2rem auto;
+  color: white;
+  font-size: 1rem;
+}
+
+.datetime-select input,
+.datetime-select select {
+  background: #111;
+  border: 2px solid #444;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color .25s ease, background .25s ease;
+}
+
+.datetime-select input:hover,
+.datetime-select select:hover {
+  border-color: #888;
+}
+
+.datetime-select input:focus,
+.datetime-select select:focus {
+  border-color: #fff;
+  background: #1b1b1b;
+}
+
+.selected-summary {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+}
+
+.selected-summary span {
+  color: #ffd700;
+  font-weight: 600;
+}
