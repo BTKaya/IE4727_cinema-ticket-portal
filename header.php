@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Movie Project Group 9</title>
@@ -11,11 +12,12 @@
 <?php
 $layoutAttr = isset($layout) ? "data-layout='$layout'" : "";
 ?>
+
 <body <?= $layoutAttr ?>>
 
 
-<header class="templates-header">
-  <button class="quick-buy">🎟 Quick Buy</button>
-  <h1 class="site-title"><a href="index.php" class="home-link">Movie Project Group 9</a></h1>
-  <a href="cart.php" class="cart-icon">🛒</a>
-</header>
+  <header class="templates-header">
+    <button class="menu">menu</button>
+    <h1 class="site-title"><a href="index.php" class="home-link">Movie Project Group 9</a></h1>
+    <a href="cart.php" class="cart-icon">🛒</a>
+  </header>
