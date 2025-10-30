@@ -104,7 +104,7 @@ body {
     align-items: center;
     padding: 1rem 1.1rem;
     border-bottom: 1px solid #222;
-    font-size: 3rem;
+    font-size: 2rem;
 }
 
 .side-panel__close {
@@ -121,7 +121,7 @@ body {
     flex-direction: column;
     gap: 0.6rem;
     padding: 1rem 1.1rem;
-    font-size: 3rem;
+    font-size: 2rem;
 }
 
 .side-panel__body a {
@@ -261,7 +261,7 @@ body {
 }
 
 .movie-name:hover {
-    transform: scale(1.5);
+    transform: scale(1.2);
     color: white;
 }
 
