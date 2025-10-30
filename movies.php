@@ -1,6 +1,8 @@
 <?php
 require __DIR__ . '/db.php';
 $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
+
+$location_id = $_GET['location_id'] ?? '';
 ?>
 
 <!DOCTYPE html>
@@ -13,6 +15,7 @@ $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
   <!-- your global css/js -->
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
+  <link rel="icon" type="image/png" href="assets/images/luminaIcon.png">
 </head>
 
 <body>
@@ -28,7 +31,8 @@ $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
         <p>No movies available.</p>
       <?php else: ?>
         <?php foreach ($movies as $movie): ?>
-          <article class="movie-card-page" onclick="location.href='movieDetail.php?id=<?= $movie['id'] ?>'">
+          <article class="movie-card-page"
+            onclick="location.href='movieDetail.php?id=<?= $movie['id'] ?>&location_id=<?= urlencode($location_id) ?>'">
             <?php if (!empty($movie['poster'])): ?>
               <img src="<?= htmlspecialchars($movie['poster']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>">
             <?php else: ?>
@@ -44,8 +48,10 @@ $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
               <?php endif; ?>
 
               <div class="movie-card-page-actions">
-                <a href="sessions.php?movie_id=<?= $movie['id'] ?>" class="btn-sessions">Sessions</a>
-                <a href="movieDetail.php?id=<?= $movie['id'] ?>" class="btn-details">Details</a>
+                <a href="movieDetail.php?id=<?= $movie['id'] ?>&location_id=<?= urlencode($location_id) ?>"
+                  class="btn-details">
+                  Details/Sessions
+                </a>
               </div>
             </div>
           </article>

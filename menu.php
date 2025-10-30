@@ -5,8 +5,8 @@
   </header>
   <nav class="side-panel__body">
     <a href="movies.php">Movies</a>
-    <a href="buy-tickets.php">Buy Tickets</a>
     <a href="locations.php">Locations</a>
+    <a href="cart.php">Cart</a>
     <a href="account.php">Account</a>
   </nav>
 </aside>

@@ -11,51 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedSeatsText = document.getElementById("selectedSeatsText");
     const totalPriceText = document.getElementById("totalPrice");
 
-    const menuBtn = document.getElementById("menuBtn");
-    const sidePanel = document.getElementById("sidePanel");
-    const closePanelBtn = document.getElementById("closePanel");
-    const panelOverlay = document.getElementById("panelOverlay");
-
-    function openPanel() {
-        sidePanel.classList.add("is-open");
-        panelOverlay.classList.add("is-open");
-        sidePanel.removeAttribute("inert");
-        sidePanel.setAttribute("aria-hidden", "false");
-        document.body.classList.add("body-locked");
-
-        // Move focus into panel for accessibility
-        const firstFocusable = sidePanel.querySelector(
-            "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
-        );
-        if (firstFocusable) firstFocusable.focus();
-    }
-
-    function closePanel() {
-        // Return focus to the trigger button
-
-        if (menuBtn) {
-            menuBtn.focus();
-        } else {
-            document.body.focus();
-        }
-        sidePanel.classList.remove("is-open");
-        panelOverlay.classList.remove("is-open");
-        sidePanel.setAttribute("inert", "");
-        sidePanel.setAttribute("aria-hidden", "true");
-        document.body.classList.remove("body-locked");
-    }
-
-    menuBtn.addEventListener("click", openPanel);
-    closePanelBtn.addEventListener("click", closePanel);
-    panelOverlay.addEventListener("click", closePanel);
-
-    // Close with Esc
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && sidePanel.classList.contains("is-open")) {
-            closePanel();
-        }
-    });
-
     function updateSelectionSummary() {
         const selectedSeats = [
             ...document.querySelectorAll(".seat.selected:not(.static)"),

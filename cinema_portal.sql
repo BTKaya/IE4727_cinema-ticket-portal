@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 27, 2025 at 02:51 PM
+-- Generation Time: Oct 30, 2025 at 09:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -57,6 +57,30 @@ INSERT INTO `bookings` (`id`, `user_id`, `movie_id`, `location`, `screening_date
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `locations`
+--
+
+CREATE TABLE `locations` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `locations`
+--
+
+INSERT INTO `locations` (`id`, `name`, `address`, `city`, `phone`, `image`) VALUES
+(1, 'Downtown Cinema', '33 Jurong Port Road', 'Singapore', '65 9000 1111', 'assets/locations/downtown.jpg'),
+(2, 'Megaplex', 'Level 3, 45 Market Street', 'Singapore', '65 8111 2222', 'assets/locations/megaplex.png'),
+(3, 'Harbour View Cinemas', '8 Wharf Road', 'Singapore', '65 8222 3333', 'assets/locations/harbour.jpg');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `movies`
 --
 
@@ -75,9 +99,9 @@ CREATE TABLE `movies` (
 --
 
 INSERT INTO `movies` (`id`, `title`, `summary`, `poster`, `location_type`, `duration`, `created_at`) VALUES
-(1, 'Movie 1', 'The summary of movie 1', 'assets/images/slide1.jpg', 1, NULL, '2025-10-27 10:01:18'),
-(2, 'Movie 2', 'A summary of movie 2', 'assets/images/slide2.jpg', 2, NULL, '2025-10-27 10:01:18'),
-(3, 'Movie 3', 'A summary of movie 3', 'assets/images/slide3.jpg', 1, NULL, '2025-10-27 10:01:18');
+(1, 'Chainsaw Man - The Movie: Reze Arc', 'In a brutal war between devils, hunters, and secret enemies, a mysterious girl named Reze has stepped into Denji\'s world, and he faces his deadliest battle yet, fueled by love in a world where survival knows no rules.', 'assets/images/slide1.webp', 1, NULL, '2025-10-27 10:01:18'),
+(2, 'Black Phone 2', 'Four years after escaping The Grabber, Finney Blake is struggling with his life after captivity. When his sister Gwen begins receiving calls in her dreams from the black phone and seeing disturbing visions of three boys being stalked at a winter camp, the siblings become determined to solve the mystery and confront a killer who has grown more powerful in death and more significant to them than either could imagine.', 'assets/images/slide2.webp', 2, NULL, '2025-10-27 10:01:18'),
+(3, 'Superman', 'Superman, a journalist in Metropolis, embarks on a journey to reconcile his Kryptonian heritage with his human upbringing as Clark Kent.', 'assets/images/slide3.webp', 1, NULL, '2025-10-27 10:01:18');
 
 -- --------------------------------------------------------
 
@@ -1575,6 +1599,12 @@ ALTER TABLE `bookings`
   ADD KEY `movie_id` (`movie_id`);
 
 --
+-- Indexes for table `locations`
+--
+ALTER TABLE `locations`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `movies`
 --
 ALTER TABLE `movies`
@@ -1602,7 +1632,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT for table `locations`
+--
+ALTER TABLE `locations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `movies`
