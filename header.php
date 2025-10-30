@@ -17,7 +17,7 @@ $layoutAttr = isset($layout) ? "data-layout='$layout'" : "";
 
 
   <header class="templates-header">
-    <button class="menu">menu</button>
+    <button id="menuBtn">menu</button>
     <h1 class="site-title"><a href="index.php" class="home-link">Movie Project Group 9</a></h1>
     <a href="cart.php" class="cart-icon">🛒</a>
   </header>
