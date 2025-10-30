@@ -26,7 +26,7 @@ $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
       <ul id="popular">
         <?php foreach ($movies as $i => $m): ?>
           <li>
-            <a href="movie.php?id=<?= $m['id'] ?>" class="movie-name"
+            <a href="movieDetail.php?id=<?= $m['id'] ?>" class="movie-name"
               data-summary="<?= htmlspecialchars($m['summary']) ?>" data-index="<?= $i ?>">
               <?= htmlspecialchars($m['title']) ?>
             </a>
@@ -48,7 +48,7 @@ $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
 
   <section class="movies-grid">
     <?php foreach ($movies as $m): ?>
-      <div class="movie-card" onclick="location.href='movie.php?id=<?= $m['id'] ?>'">
+      <div class="movie-card" onclick="location.href='movieDetail.php?id=<?= $m['id'] ?>'">
         <img src="<?= htmlspecialchars($m['poster']) ?>" alt="">
         <h3><?= htmlspecialchars($m['title']) ?></h3>
       </div>

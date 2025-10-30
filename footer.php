@@ -1,5 +1,5 @@
 <footer class="site-footer">
-  <p>© 2025 Movie Project Group 9</p>
+  <p>© 2025 Lumina Cinema</p>
 </footer>
 </body>
 <html>

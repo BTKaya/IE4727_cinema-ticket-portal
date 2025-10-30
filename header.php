@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Movie Project Group 9</title>
+  <title>Lumina Cinema</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
@@ -17,7 +17,11 @@ $layoutAttr = isset($layout) ? "data-layout='$layout'" : "";
 
 
   <header class="templates-header">
-    <button id="menuBtn">menu</button>
-    <h1 class="site-title"><a href="index.php" class="home-link">Movie Project Group 9</a></h1>
+    <button class="menu" id="menuBtn">Menu</button>
+    <h1 class="site-title">
+      <a href="index.php">
+        <img src="assets/images/luminaLogo.png" alt="Lumina Cinema Logo" class="site-logo">
+      </a>
+    </h1>
     <a href="cart.php" class="cart-icon">🛒</a>
   </header>

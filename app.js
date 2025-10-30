@@ -17,16 +17,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const panelOverlay = document.getElementById("panelOverlay");
 
     function openPanel() {
-        panel.classList.add("is-open");
-        overlay.classList.add("is-open");
-        panel.setAttribute("aria-hidden", "false");
+        sidePanel.classList.add("is-open");
+        panelOverlay.classList.add("is-open");
+        sidePanel.removeAttribute("inert");
+        sidePanel.setAttribute("aria-hidden", "false");
         document.body.classList.add("body-locked");
+
+        // Move focus into panel for accessibility
+        const firstFocusable = sidePanel.querySelector(
+            "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+        );
+        if (firstFocusable) firstFocusable.focus();
     }
 
     function closePanel() {
-        panel.classList.remove("is-open");
-        overlay.classList.remove("is-open");
-        panel.setAttribute("aria-hidden", "true");
+        // Return focus to the trigger button
+
+        if (menuBtn) {
+            menuBtn.focus();
+        } else {
+            document.body.focus();
+        }
+        sidePanel.classList.remove("is-open");
+        panelOverlay.classList.remove("is-open");
+        sidePanel.setAttribute("inert", "");
+        sidePanel.setAttribute("aria-hidden", "true");
         document.body.classList.remove("body-locked");
     }
 
