@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 31, 2025 at 04:53 PM
+-- Generation Time: Oct 31, 2025 at 05:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -31,7 +31,8 @@ CREATE TABLE `bookings` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT 0,
   `movie_id` int(11) NOT NULL,
-  `location` varchar(100) DEFAULT NULL,
+  `session_id` int(11) NOT NULL,
+  `location_id` int(11) DEFAULT NULL,
   `screening_date` date NOT NULL,
   `screening_time` time NOT NULL,
   `seats` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`seats`)),
@@ -45,8 +46,8 @@ CREATE TABLE `bookings` (
 -- Dumping data for table `bookings`
 --
 
-INSERT INTO `bookings` (`id`, `user_id`, `movie_id`, `location`, `screening_date`, `screening_time`, `seats`, `price_per_seat`, `total_price`, `status`, `created_at`) VALUES
-(49, 2, 2, 'Harbour View Cinemas', '2025-10-16', '15:00:00', '[\"A5\",\"A6\"]', 10.00, 20.00, 'pending', '2025-10-31 15:26:31');
+INSERT INTO `bookings` (`id`, `user_id`, `movie_id`, `session_id`, `location_id`, `screening_date`, `screening_time`, `seats`, `price_per_seat`, `total_price`, `status`, `created_at`) VALUES
+(51, 2, 2, 110, 2, '2025-11-04', '12:00:00', '[\"H7\",\"H8\"]', 10.00, 20.00, 'pending', '2025-10-31 16:37:10');
 
 -- --------------------------------------------------------
 
@@ -2880,7 +2881,8 @@ INSERT INTO `users` (`id`, `email`, `password_hash`, `username`, `created_at`) V
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `movie_id` (`movie_id`);
+  ADD KEY `movie_id` (`movie_id`),
+  ADD KEY `fk_bookings_session` (`session_id`);
 
 --
 -- Indexes for table `locations`
@@ -2924,7 +2926,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `locations`
@@ -2965,7 +2967,8 @@ ALTER TABLE `users`
 --
 ALTER TABLE `bookings`
   ADD CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`id`);
+  ADD CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`movie_id`) REFERENCES `movies` (`id`),
+  ADD CONSTRAINT `fk_bookings_session` FOREIGN KEY (`session_id`) REFERENCES `sessions` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `sessions`

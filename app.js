@@ -164,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         confirmBtn.addEventListener("click", async () => {
             clearSeatErrors();
 
+            // 1) validate single-seat gap
             const offenders = findSingleSeatGapOffenders();
             if (offenders.length > 0) {
                 offenders.forEach((el) => el.classList.add("error"));
@@ -173,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // 2) collect selected seats
             const selectedSeats = [
                 ...document.querySelectorAll(".seat.selected:not(.static)"),
             ].map((s) => s.dataset.seat);
@@ -182,43 +184,95 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const date = document.getElementById("screening_date").value;
-            const time = document.getElementById("screening_time").value;
+            // 3) get current dropdown values
+            const dateEl = document.getElementById("screening_date");
+            const timeEl = document.getElementById("screening_time");
+            const locEl = document.getElementById("location");
+
+            const date = dateEl ? dateEl.value : "";
+            const time = timeEl ? timeEl.value : "";
+            const locationName = locEl ? locEl.value : "";
+
+            // 4) find the matching session_id from window.SESSIONS
+            const SESSIONS = window.SESSIONS || [];
+            const LOCATIONS = window.LOCATIONS || {};
+
+            // Convert location name → id using the global LOCATIONS map
+            const locationId = Object.keys(LOCATIONS).find(
+                (id) => LOCATIONS[id] === locationName
+            );
+
+            // Match the right session entry
+            const session = SESSIONS.find(
+                (s) =>
+                    s.session_date === date &&
+                    s.session_time.startsWith(time) &&
+                    String(s.location_id) === String(locationId)
+            );
+
+            if (!session) {
+                showPopup(
+                    "❌ Session not found",
+                    "This date / time / location is not a valid session anymore. Please reselect.",
+                    false
+                );
+                return;
+            }
+
+            const sessionId =
+                session.id || session.session_id || session.sessionId;
+            if (!sessionId) {
+                showPopup(
+                    "❌ Session missing ID",
+                    "Could not determine the session ID. Please contact admin.",
+                    false
+                );
+                return;
+            }
+
+            // 5) movie id from URL
             const movieId = new URLSearchParams(window.location.search).get(
                 "id"
             );
-            const location = document.getElementById("location").value;
 
             console.log("📤 Sending booking request:", {
-                movieId,
-                selectedSeats,
-                date,
-                time,
-                location,
+                movie_id: movieId,
+                session_id: sessionId,
+                seats: selectedSeats,
             });
 
-            const res = await fetch("save_booking.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    movie_id: movieId,
-                    seats: selectedSeats,
-                    date,
-                    time,
-                    location,
-                }),
-            });
-            console.log("📥 Raw response:", await res.clone().text());
+            // 6) send booking request to server
+            try {
+                const res = await fetch("save_booking.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        movie_id: movieId,
+                        session_id: sessionId,
+                        seats: selectedSeats,
+                    }),
+                });
 
-            const data = await res.json();
-            if (data.success) {
-                showPopup(
-                    "✅ Seats Saved!",
-                    "Your seats have been added to your cart.",
-                    true
-                );
-            } else {
-                showPopup("❌ Error", data.message, false);
+                const raw = await res.clone().text();
+                console.log("📥 Raw response:", raw);
+
+                const data = JSON.parse(raw);
+                if (data.success) {
+                    showPopup(
+                        "✅ Seats Saved!",
+                        "Your seats have been added to your cart.",
+                        true
+                    );
+                } else {
+                    showPopup(
+                        "❌ Error",
+                        data.message || "Unknown error",
+                        false
+                    );
+                }
+            } catch (err) {
+                console.error(err);
+                showPopup("❌ Error", "Network or server error.", false);
             }
         });
     }
