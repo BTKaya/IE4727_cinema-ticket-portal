@@ -28,6 +28,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Popup once seats are selected
+    function showPopup(title, message, showCartButton) {
+        const overlay = document.getElementById("popup-overlay");
+        const titleEl = document.getElementById("popup-title");
+        const messageEl = document.getElementById("popup-message");
+        const closeBtn = document.getElementById("popup-close");
+        const cartBtn = document.getElementById("popup-cart");
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        cartBtn.style.display = showCartButton ? "inline-block" : "none";
+
+        overlay.classList.add("show");
+
+        closeBtn.onclick = () => {
+            overlay.classList.remove("show");
+            if (showCartButton) location.reload();
+        };
+    }
+
     // Toggle seat selection consistently
     document.querySelectorAll(".seat").forEach((seat) => {
         seat.addEventListener("click", () => {
@@ -167,12 +187,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const movieId = new URLSearchParams(window.location.search).get(
                 "id"
             );
+            const location = document.getElementById("location").value;
 
             console.log("📤 Sending booking request:", {
                 movieId,
                 selectedSeats,
                 date,
                 time,
+                location,
             });
 
             const res = await fetch("save_booking.php", {
@@ -183,17 +205,61 @@ document.addEventListener("DOMContentLoaded", () => {
                     seats: selectedSeats,
                     date,
                     time,
+                    location,
                 }),
             });
             console.log("📥 Raw response:", await res.clone().text());
 
             const data = await res.json();
             if (data.success) {
-                alert("✅ Seats saved! They will now appear in your cart.");
-                location.reload();
+                showPopup(
+                    "✅ Seats Saved!",
+                    "Your seats have been added to your cart.",
+                    true
+                );
             } else {
-                alert("❌ " + data.message);
+                showPopup("❌ Error", data.message, false);
             }
         });
     }
+
+    // Searchbar Search
+    const searchOverlay = document.getElementById("searchOverlay");
+    const searchBar = document.getElementById("searchBar");
+    const searchInput = document.getElementById("searchInput");
+    const searchClose = document.getElementById("searchClose");
+    const searchTrigger = document.getElementById("openSearch"); // optional search icon
+
+    function openSearch() {
+        searchBar.classList.add("show");
+        searchOverlay.classList.add("show");
+        searchInput.focus();
+    }
+
+    function closeSearch() {
+        searchBar.classList.remove("show");
+        searchOverlay.classList.remove("show");
+        searchInput.value = "";
+    }
+
+    if (searchTrigger) searchTrigger.addEventListener("click", openSearch);
+    searchClose.addEventListener("click", closeSearch);
+    searchOverlay.addEventListener("click", closeSearch);
+
+    // Handle "Enter" key press
+    searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (query.length > 0) {
+                window.location.href =
+                    "searchresult.php?q=" + encodeURIComponent(query);
+            }
+        }
+    });
+
+    document.querySelectorAll("select").forEach((sel) => {
+        sel.addEventListener("focus", () => sel.classList.add("open"));
+        sel.addEventListener("blur", () => sel.classList.remove("open"));
+    });
 });

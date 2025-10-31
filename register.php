@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
   <?php include 'header.php'; ?>
+  <?php include 'menu.php'; ?>
 
   <div class="auth-container">
     <h1>Create account</h1>

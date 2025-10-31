@@ -1,6 +1,14 @@
 <?php
 include 'db.php';
 $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
+
+$locations = $pdo->query("SELECT id, name FROM locations ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+
+// Define which IDs you want to show
+$allowedIds = [1, 2, 3];
+
+// Filter the movies array
+$filteredMovies = array_filter($movies, fn($m) => in_array($m['id'], $allowedIds));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +32,7 @@ $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
   <main class="hero-wrap">
     <aside class="popular-list">
       <ul id="popular">
-        <?php foreach ($movies as $i => $m): ?>
+        <?php foreach ($filteredMovies as $i => $m): ?>
           <li>
             <a href="movieDetail.php?id=<?= $m['id'] ?>" class="movie-name"
               data-summary="<?= htmlspecialchars($m['summary']) ?>" data-index="<?= $i ?>">
@@ -39,7 +47,7 @@ $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
 
     <section class="carousel" id="carousel">
       <div class="slides">
-        <?php foreach ($movies as $i => $m): ?>
+        <?php foreach ($filteredMovies as $i => $m): ?>
           <img src="<?= htmlspecialchars($m['poster']) ?>" class="slideshow-image <?= $i === 0 ? 'active' : '' ?>">
         <?php endforeach; ?>
       </div>
@@ -54,6 +62,44 @@ $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
       </div>
     <?php endforeach; ?>
   </section>
+
+  <aside class="quickbuy-list">
+    <ul id="quickbuy">
+      <li>
+        <a href="#" id="quickBuyToggle" class="quickbuy-text">Quick Buy</a>
+      </li>
+    </ul>
+
+    <div class="quickbuy-container" id="quickBuyContainer">
+      <form action="checkout.php" method="GET">
+        <label for="movie">Movie:</label>
+        <div class="select-wrap">
+          <select id="movie" name="movie_id" required>
+            <?php foreach ($movies as $m): ?>
+              <option value="<?= htmlspecialchars($m['id']) ?>">
+                <?= htmlspecialchars($m['title']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <label for="location">Location:</label>
+        <select id="location" name="location_id" required>
+          <option value="">Select a cinema</option>
+          <?php foreach ($locations as $loc): ?>
+            <option value="<?= htmlspecialchars($loc['id']) ?>">
+              <?= htmlspecialchars($loc['name']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+
+        <label for="showtime">Showtime:</label>
+        <input type="datetime-local" id="showtime" name="showtime" required>
+
+        <button type="submit" class="buy-btn">Buy</button>
+      </form>
+    </div>
+  </aside>
 
   <?php include 'footer.php'; ?>
 

@@ -17,6 +17,22 @@ $layout = $movie['location_type'];
 // Get Location info
 $stmt2 = $pdo->query("SELECT id, name FROM locations ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
+// fetch sessions for this movie from sessions table
+$sessionsStmt = $pdo->prepare("
+    SELECT session_date, session_time, location_id
+    FROM sessions
+    WHERE movie_id = ?
+    ORDER BY session_date, session_time
+");
+$sessionsStmt->execute([$movie_id]);
+$sessions = $sessionsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// we also need location names by id for the dropdowns
+$locationsById = [];
+foreach ($stmt2 as $loc) {
+  $locationsById[$loc['id']] = $loc['name'];
+}
+
 include 'header.php';
 include 'menu.php';
 
@@ -79,40 +95,20 @@ $rows = range('A', 'H');
 
   <div class="dateTimeLocation-select">
     <label>Date:</label>
-    <input type="date" id="screening_date" value="<?= htmlspecialchars($date); ?>">
+    <select id="screening_date">
+      <option value="">-- Select --</option>
+    </select>
 
     <label style="margin-left:1rem;">Time:</label>
     <select id="screening_time">
       <option value="">-- Select --</option>
-      <option value="09:00" <?= $time == "09:00" ? "selected" : ""; ?>>9:00 AM</option>
-      <option value="12:00" <?= $time == "12:00" ? "selected" : ""; ?>>12:00 PM</option>
-      <option value="15:00" <?= $time == "15:00" ? "selected" : ""; ?>>3:00 PM</option>
-      <option value="19:00" <?= $time == "19:00" ? "selected" : ""; ?>>7:00 PM</option>
     </select>
 
     <label style="margin-left:1rem;">Location:</label>
     <select id="location">
       <option value="">-- Select --</option>
-      <?php foreach ($stmt2 as $loc): ?>
-        <option value="<?= htmlspecialchars($loc['name']) ?>" <?= ($location === $loc['name']) ? 'selected' : '' ?>>
-          <?= htmlspecialchars($loc['name']) ?>
-        </option>
-      <?php endforeach; ?>
     </select>
   </div>
-
-  <script>
-    function updateShowtimeRedirect() {
-      const d = document.getElementById('screening_date').value;
-      const t = document.getElementById('screening_time').value;
-      const l = document.getElementById('location').value;
-      const id = <?= $movie_id ?>;
-      if (d && t && l) location.href = `movieDetail.php?id=${id}&date=${d}&time=${t}&location=${l}`;
-    }
-    document.getElementById('screening_date').addEventListener('change', updateShowtimeRedirect);
-    document.getElementById('screening_time').addEventListener('change', updateShowtimeRedirect);
-    document.getElementById('location').addEventListener('change', updateShowtimeRedirect);
-  </script>
 
   <!---------------- SEAT MAP ---------------->
   <?php if ($date && $time && $location): ?>
@@ -178,5 +174,27 @@ $rows = range('A', 'H');
   <?php endif; ?>
 
 </div>
+
+<!-- Popup Overlay -->
+<div id="popup-overlay" class="popup-overlay">
+  <div class="popup-box">
+    <h2 id="popup-title"></h2>
+    <p id="popup-message"></p>
+    <div class="popup-buttons">
+      <button id="popup-close" class="popup-btn">OK</button>
+      <a href="cart.php" id="popup-cart" class="popup-btn cart-link" style="display:none;">Go to Cart</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.SESSIONS = <?= json_encode($sessions) ?>;
+  window.LOCATIONS = <?= json_encode($locationsById) ?>;
+  window.MOVIE_ID = <?= (int) $movie_id ?>;
+  window.INIT_DATE = "<?= $date ?>";
+  window.INIT_TIME = "<?= $time ?>";
+  window.INIT_LOC = "<?= $location ?>";
+</script>
+<script src="movieDetail.js" defer></script>
 
 <?php include 'footer.php'; ?>

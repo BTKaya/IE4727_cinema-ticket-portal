@@ -7,6 +7,8 @@
     --bg: #000;
     --bg2: #111;
     --accent: #ffffff;
+    --card-height: 700px;
+    --grid-cols: 5;
 }
 
 * {
@@ -20,6 +22,17 @@ body {
     color: var(--text);
     font-family: "Poppins", sans-serif;
     overflow-x: hidden;
+}
+
+option {
+    background: #111; /* dark background inside dropdown list */
+    color: #fff;
+}
+
+option:checked,
+option:hover {
+    background: #ff4d4d; /* highlight color for selected/hovered option */
+    color: #fff;
 }
 
 /* ================= HEADER ================= */
@@ -113,10 +126,13 @@ body {
     color: inherit;
     font-size: 1.3rem;
     cursor: pointer;
+}
+
+.closeButton {
     transition: transform 0.25s ease; /* smooth rotation */
 }
 
-.side-panel__close:hover {
+.closeButton:hover {
     transform: scale(1.5) rotate(90deg);
 }
 
@@ -239,7 +255,6 @@ body {
     cursor: pointer;
     font-size: 1.2rem;
     opacity: 0.85;
-    transition: opacity 0.2s ease;
 }
 
 .searchbar button:hover {
@@ -324,7 +339,7 @@ body {
     }
 }
 
-/* OPTIONAL DARK FADE FOR READABILITY */
+/* DARK FADE FOR READABILITY */
 .hero-wrap::before {
     content: "";
     position: absolute;
@@ -335,6 +350,21 @@ body {
         rgba(0, 0, 0, 0) 60%
     );
     z-index: 2;
+}
+
+.hero-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    /* circle at bottom right */
+    background: radial-gradient(
+        circle at bottom right,
+        rgba(0, 0, 0, 0.85) 0%,
+        rgba(0, 0, 0, 0.6) 25%,
+        rgba(0, 0, 0, 0) 60%
+    );
+    z-index: 2;
+    pointer-events: none;
 }
 
 /* ================= MOVIE LIST BOTTOM LEFT ================= */
@@ -847,7 +877,7 @@ body {
 
 .movies-grid-page {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(var(--grid-cols), 1fr);
     gap: 2rem 1.6rem;
     align-items: flex-start;
 }
@@ -859,7 +889,8 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    min-height: 280px;
+    min-height: var(--card-height);
+    max-height: var(--card-height);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
@@ -1137,4 +1168,411 @@ body {
 
 .auth-container ul li {
     margin-bottom: 0.3rem;
+}
+
+/* ================= Account ================= */
+.account-wrapper {
+    margin-top: calc(var(--header-h) + 30px); /* was +60px */
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* top alignment instead of full center */
+    min-height: calc(100vh - var(--header-h) - 170px);
+}
+
+.account-card {
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(14px);
+    border: 1px solid #222;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+    max-width: 480px;
+    width: 100%;
+    padding: 2.5rem 3rem;
+    text-align: center;
+    color: var(--text);
+    animation: fadeIn 0.6s ease;
+}
+
+.account-card h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 2rem;
+}
+
+.account-details {
+    text-align: left;
+    margin-bottom: 2.2rem;
+    line-height: 1.8;
+}
+
+.account-details p {
+    margin-bottom: 0.7rem;
+    font-size: 1.05rem;
+    color: #ddd;
+}
+
+.account-details span {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.account-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.6rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.25s ease;
+}
+
+.btn-cart {
+    background: #2196f3;
+    color: #fff;
+}
+
+.btn-cart:hover {
+    background: #42a5f5;
+    transform: translateY(-2px);
+}
+
+.btn-logout {
+    background: #e53935;
+    color: #fff;
+}
+
+.btn-logout:hover {
+    background: #ff5c5c;
+    transform: translateY(-2px);
+}
+
+/* fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================= POPUP OVERLAY ================= */
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.popup-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.popup-box {
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 2rem 2.5rem;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+    animation: popupFadeIn 0.4s ease;
+    color: #fff;
+}
+
+.popup-box h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.popup-box p {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.popup-btn {
+    background: #2196f3;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.popup-btn:hover {
+    background: #42a5f5;
+    transform: translateY(-2px);
+}
+
+.popup-btn.cart-link {
+    background: #e53935;
+}
+
+.popup-btn.cart-link:hover {
+    background: #ff5c5c;
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ================= Quick Buy ================= */
+.quickbuy-list {
+    position: fixed;
+    bottom: 8%; /* was top: 40% */
+    right: 3.5%;
+    z-index: 110;
+}
+
+#quickbuy {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#quickbuy li {
+    margin: 0;
+    padding: 0;
+}
+
+.quickbuy-text {
+    display: inline-block;
+    font-size: calc(2vw);
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    transition: transform 0.35s ease, color 0.35s ease;
+    position: relative;
+    transform-origin: right center;
+}
+
+.quickbuy-text::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    right: 0;
+    width: 0%;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.35s ease;
+}
+
+.quickbuy-text:hover {
+    transform: scale(1.2);
+    color: #fff;
+}
+
+.quickbuy-text:hover::after {
+    width: 100%;
+}
+
+.quickbuy-container {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.4rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    background: transparent;
+    backdrop-filter: none;
+    color: #fff;
+    padding: 0.5rem 0;
+}
+
+.quickbuy-list.active .quickbuy-text {
+    transform: translateY(-200px);
+}
+
+.quickbuy-list.active .quickbuy-container {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(-200px);
+}
+
+.quickbuy-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-size: 1rem;
+}
+
+.quickbuy-container label {
+    font-weight: 500;
+    color: #ccc;
+}
+
+.quickbuy-container select,
+.quickbuy-container input {
+    appearance: none;
+    border-radius: 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #555;
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.7rem 0.7rem;
+    outline: none;
+    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease,
+        transform 0.25s ease;
+    cursor: pointer;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 10 6'%3E%3Cpath fill='white' d='M0 0l5 6 5-6H0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    background-size: 6px 4px;
+}
+
+.quickbuy-container select.open {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='white' d='M0 6l5 -6 5 6H0z'/%3E%3C/svg%3E");
+}
+
+.quickbuy-container select:hover,
+.quickbuy-container input:hover {
+    transform: scale(1.05);
+}
+
+.buy-btn {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    margin-top: 0.4rem;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: opacity 0.25s ease;
+}
+
+.buy-btn:hover {
+    opacity: 0.8;
+}
+
+.visually-hidden-select {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    width: 0;
+}
+
+/* wrapper */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    min-width: 210px;
+    font-family: inherit;
+}
+
+/* trigger looks like your inputs */
+.dropdown-trigger {
+    width: 100%;
+    background: rgba(20, 20, 20, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 0.55rem 2.2rem 0.55rem 0.85rem;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    backdrop-filter: blur(6px);
+}
+
+/* arrow on trigger */
+.dropdown-trigger::after {
+    content: "";
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    width: 10px;
+    height: 6px;
+    transform: translateY(-50%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='white' d='M0 0l5 6 5-6H0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 10px 6px;
+    transition: transform 0.25s ease;
+}
+
+/* the actual dropdown list */
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    left: 0;
+    width: 100%;
+    background: rgba(8, 8, 8, 0.35); /* translucent */
+    backdrop-filter: blur(12px); /* frosted */
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 200;
+}
+
+/* each option */
+.dropdown-item {
+    padding: 0.55rem 0.8rem;
+    color: #fff;
+    font-size: 0.95rem;
+    background: rgba(0, 0, 0, 0); /* base transparent */
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+/* hover: grey, not blue */
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* selected state */
+.dropdown-item.is-selected {
+    background: rgba(0, 0, 0, 0.35);
+}
+
+/* open state */
+.dropdown.open .dropdown-menu {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.dropdown.open .dropdown-trigger::after {
+    transform: translateY(-50%) rotate(180deg);
 }

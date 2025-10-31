@@ -74,4 +74,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     searchClose?.addEventListener("click", closeSearch);
     searchOverlay?.addEventListener("click", closeSearch);
+
+    const toggle = document.getElementById("quickBuyToggle");
+    const quickbuy = document.querySelector(".quickbuy-list");
+
+    toggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        quickbuy.classList.toggle("active");
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!quickbuy.contains(e.target)) {
+            quickbuy.classList.remove("active");
+        }
+    });
 });
