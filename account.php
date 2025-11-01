@@ -1,10 +1,10 @@
 <?php
+
 include 'db.php';
 include 'header.php';
 include 'menu.php';
 include 'auth.php';
 
-session_start();
 
 // handle logout
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {

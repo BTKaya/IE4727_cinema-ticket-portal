@@ -50,18 +50,62 @@ option:hover {
 }
 
 .templates-header {
-    height: var(--header-h);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--bg2);
-    color: var(--text);
-    padding: 0 1.5rem;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    height: var(--header-h);
     z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    background: none;
+    overflow: hidden;
+}
+
+.templates-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%; /* extend below header so fade is visible */
+    background: transparent;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    /* make the blur disappear toward the bottom */
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.9) 0%,
+        rgba(0, 0, 0, 0.8) 45%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.9) 55%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* 2) tint layer (stays the same) */
+.templates-header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    height: 100%; /* match the blur height */
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.75) 0%,
+        rgba(0, 0, 0, 0.3) 55%,
+        rgba(0, 0, 0, 0.05) 85%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    z-index: -1;
 }
 
 .templates-header a {
@@ -280,9 +324,9 @@ option:hover {
 /* ================= HERO / SLIDESHOW ================= */
 .hero-wrap {
     position: relative;
-    height: calc(100vh - var(--header-h));
+    height: calc(100vh);
     width: 100%;
-    margin-top: var(--header-h);
+
     overflow: hidden;
 }
 
@@ -1351,7 +1395,7 @@ option:hover {
 
 /* ================= Quick Buy ================= */
 .quickbuy-list {
-    position: fixed;
+    position: absolute;
     bottom: 8%; /* was top: 40% */
     right: 3.5%;
     z-index: 110;
@@ -1412,16 +1456,17 @@ option:hover {
     backdrop-filter: none;
     color: #fff;
     padding: 0.5rem 0;
+    width: 300px;
 }
 
 .quickbuy-list.active .quickbuy-text {
-    transform: translateY(-200px);
+    transform: translateY(-265px);
 }
 
 .quickbuy-list.active .quickbuy-container {
     opacity: 1;
     pointer-events: all;
-    transform: translateY(-200px);
+    transform: translateY(-265px);
 }
 
 .quickbuy-container form {
@@ -1457,29 +1502,69 @@ option:hover {
     background-size: 6px 4px;
 }
 
+.quickbuy-container button {
+    appearance: none;
+    border-radius: 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #555;
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.7rem 1.7rem 0.7rem 0.7rem;
+    outline: none;
+    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease,
+        transform 0.25s ease;
+    cursor: pointer;
+}
+
+button.buy-btn {
+    padding: 0.7rem 1rem;
+}
+
 .quickbuy-container select.open {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='white' d='M0 6l5 -6 5 6H0z'/%3E%3C/svg%3E");
 }
 
 .quickbuy-container select:hover,
-.quickbuy-container input:hover {
-    transform: scale(1.05);
+.quickbuy-container input:hover,
+.quickbuy-container button:hover {
+    transform: scale(1.1);
 }
 
 .buy-btn {
+    display: inline-block;
     align-self: flex-end;
+    font-size: calc(1vw);
+    font-weight: 600;
+    color: #fff;
     background: none;
     border: none;
-    color: #fff;
-    font-weight: 600;
-    margin-top: 0.4rem;
+    text-decoration: none;
+    position: relative;
+    transform-origin: right center;
     cursor: pointer;
-    text-decoration: underline;
-    transition: opacity 0.25s ease;
+    transition: transform 0.35s ease, color 0.35s ease;
+    padding-top: 0.4rem;
+}
+
+.buy-btn::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    right: 0;
+    width: 0%;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.35s ease;
 }
 
 .buy-btn:hover {
-    opacity: 0.8;
+    transform: scale(1.2);
+    color: #fff; /* keep same color, but allows transition effect */
+}
+
+.buy-btn:hover::after {
+    width: 100%;
 }
 
 .visually-hidden-select {
@@ -1509,7 +1594,7 @@ option:hover {
     text-align: left;
     cursor: pointer;
     position: relative;
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(3px);
 }
 
 /* arrow on trigger */
@@ -1530,20 +1615,32 @@ option:hover {
 /* the actual dropdown list */
 .dropdown-menu {
     position: absolute;
-    top: calc(100% + 0.45rem);
+    bottom: calc(100% + 0.45rem); /* appears above */
     left: 0;
     width: 100%;
-    background: rgba(8, 8, 8, 0.35); /* translucent */
-    backdrop-filter: blur(12px); /* frosted */
+    background: rgba(8, 8, 8, 0.2); /* adjust opacity here */
+    backdrop-filter: blur(3px);
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.03);
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     opacity: 0;
     pointer-events: none;
-    transform: translateY(6px);
+    transform: translateY(-6px); /* upward animation */
     transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 200;
+    max-height: 30vw; /* adjust */
+    overflow-y: auto;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent; /* thumb + track */
+}
+
+.dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
 }
 
 /* each option */

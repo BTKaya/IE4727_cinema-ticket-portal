@@ -61,7 +61,3 @@ $location_id = $_GET['location_id'] ?? '';
   </main>
 
   <?php include __DIR__ . '/footer.php'; ?>
-
-</body>
-
-</html>
