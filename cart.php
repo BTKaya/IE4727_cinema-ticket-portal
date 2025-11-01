@@ -4,8 +4,6 @@ include 'header.php';
 include 'menu.php';
 include 'auth.php';
 
-session_start();
-
 // handle logout
 if (isset($_GET['logout'])) {
   session_unset();
