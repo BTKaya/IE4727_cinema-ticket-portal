@@ -159,9 +159,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return [...offenders];
     }
 
-    // Confirm Booking
+    // Confirm Booking (NO JSON, NO fetch)
     if (confirmBtn) {
-        confirmBtn.addEventListener("click", async () => {
+        confirmBtn.addEventListener("click", () => {
             clearSeatErrors();
 
             // 1) validate single-seat gap
@@ -235,45 +235,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 "id"
             );
 
-            console.log("📤 Sending booking request:", {
-                movie_id: movieId,
-                session_id: sessionId,
-                seats: selectedSeats,
+            // 6) instead of fetch+JSON → make a normal POST form submit
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = "save_booking.php";
+
+            const addField = (name, value) => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            };
+
+            addField("movie_id", movieId || "");
+            addField("session_id", sessionId);
+            addField("date", date);
+            addField("time", time);
+            addField("location_id", locationId || "");
+            addField("location_name", locationName || "");
+
+            // seats[]
+            selectedSeats.forEach((seatName) => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "seats[]";
+                input.value = seatName;
+                form.appendChild(input);
             });
 
-            // 6) send booking request to server
-            try {
-                const res = await fetch("save_booking.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        movie_id: movieId,
-                        session_id: sessionId,
-                        seats: selectedSeats,
-                    }),
-                });
-
-                const raw = await res.clone().text();
-                console.log("📥 Raw response:", raw);
-
-                const data = JSON.parse(raw);
-                if (data.success) {
-                    showPopup(
-                        "✅ Seats Saved!",
-                        "Your seats have been added to your cart.",
-                        true
-                    );
-                } else {
-                    showPopup(
-                        "❌ Error",
-                        data.message || "Unknown error",
-                        false
-                    );
-                }
-            } catch (err) {
-                console.error(err);
-                showPopup("❌ Error", "Network or server error.", false);
-            }
+            document.body.appendChild(form);
+            form.submit();
         });
     }
 
@@ -297,20 +289,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (searchTrigger) searchTrigger.addEventListener("click", openSearch);
-    searchClose.addEventListener("click", closeSearch);
-    searchOverlay.addEventListener("click", closeSearch);
+    if (searchClose) searchClose.addEventListener("click", closeSearch);
+    if (searchOverlay) searchOverlay.addEventListener("click", closeSearch);
 
     // Handle "Enter" key press
-    searchInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            const query = searchInput.value.trim();
-            if (query.length > 0) {
-                window.location.href =
-                    "searchresult.php?q=" + encodeURIComponent(query);
+    if (searchInput) {
+        searchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (query.length > 0) {
+                    window.location.href =
+                        "searchresult.php?q=" + encodeURIComponent(query);
+                }
             }
-        }
-    });
+        });
+    }
 
     document.querySelectorAll("select").forEach((sel) => {
         sel.addEventListener("focus", () => sel.classList.add("open"));

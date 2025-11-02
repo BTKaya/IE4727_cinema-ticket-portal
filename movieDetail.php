@@ -28,6 +28,8 @@ $sessionsStmt = $pdo->prepare("
 $sessionsStmt->execute([$movie_id]);
 $sessions = $sessionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
+$session_id = isset($_GET['session_id']) ? (int) $_GET['session_id'] : 0;
+
 // Create associative array of locations for JS
 $locationsById = [];
 foreach ($stmt2 as $loc) {
@@ -58,6 +60,27 @@ if ($location_id != 0) {
     }
   }
 }
+
+// if session_id is provided, we can derive date/time/location from the DB
+if ($session_id) {
+  $sessStmt = $pdo->prepare("
+      SELECT movie_id, location_id, session_date, session_time
+      FROM sessions
+      WHERE id = ?
+      LIMIT 1
+  ");
+  $sessStmt->execute([$session_id]);
+  $sessRow = $sessStmt->fetch(PDO::FETCH_ASSOC);
+
+  if ($sessRow) {
+    // override with authoritative values from DB
+    $movie_id = (int) $sessRow['movie_id'];     // safe to overwrite
+    $location_id = (int) $sessRow['location_id'];
+    $date = $sessRow['session_date'];
+    $time = substr($sessRow['session_time'], 0, 5); // "19:00:00" -> "19:00"
+  }
+}
+
 
 // ---------------- FETCH BOOKED SEATS ----------------
 $bookedSeats = [];
