@@ -24,9 +24,14 @@ if (!is_array($seats)) {
 }
 
 /**
- * 2. Temporary user handling (replace with real auth later)
+ * 2. User handling, replaced
  */
-$user_id = $_SESSION['user_id'] ?? 1;
+if (!isset($_SESSION['user_id'])) {
+    echo "<script>alert('Please log in before booking seats.'); window.location='account.php';</script>";
+    exit;
+}
+
+$user_id = (int) $_SESSION['user_id'];
 
 /**
  * 3. Get the session from DB to verify it and to get canonical date/time/location
