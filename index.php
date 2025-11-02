@@ -46,6 +46,24 @@ foreach ($sessions as $row) {
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
   <link rel="icon" type="image/png" href="assets/images/luminaIcon.png">
+  <style>
+    html,
+    body {
+      height: 100%;
+      overflow-y: scroll;
+      /* allow scrolling */
+      scrollbar-width: none;
+      /* Firefox */
+      -ms-overflow-style: none;
+      /* IE/Edge */
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none;
+      /* Chrome, Safari, Opera */
+    }
+  </style>
 </head>
 
 <body>
@@ -76,6 +94,38 @@ foreach ($sessions as $row) {
         <?php endforeach; ?>
       </div>
     </section>
+
+    <aside class="quickbuy-list">
+      <ul id="quickbuy">
+        <li>
+          <a href="#" id="quickBuyToggle" class="quickbuy-text">Quick Buy</a>
+        </li>
+      </ul>
+
+      <div class="quickbuy-container" id="quickBuyContainer">
+        <form id="quickBuyForm" action="#" method="GET">
+          <label for="movie">Movie:</label>
+          <select id="movie" name="movie_id" class="opened-list-styling" required>
+            <option value="">Select a movie</option>
+            <?php foreach ($movieMap as $mid => $mtitle): ?>
+              <option value="<?= htmlspecialchars($mid) ?>"><?= htmlspecialchars($mtitle) ?></option>
+            <?php endforeach; ?>
+          </select>
+
+          <label for="location">Location:</label>
+          <select id="location" name="location_id" class="opened-list-styling" required disabled>
+            <option value="">Select a cinema</option>
+          </select>
+
+          <label for="showtime">Showtime:</label>
+          <select id="showtime" name="session_id" class="opened-list-styling" required disabled>
+            <option value="">Select a showtime</option>
+          </select>
+
+          <button type="submit" class="buy-btn">Buy</button>
+        </form>
+      </div>
+    </aside>
   </main>
 
   <section class="movies-grid">
@@ -86,38 +136,6 @@ foreach ($sessions as $row) {
       </div>
     <?php endforeach; ?>
   </section>
-
-  <aside class="quickbuy-list">
-    <ul id="quickbuy">
-      <li>
-        <a href="#" id="quickBuyToggle" class="quickbuy-text">Quick Buy</a>
-      </li>
-    </ul>
-
-    <div class="quickbuy-container" id="quickBuyContainer">
-      <form action="checkout.php" method="GET">
-        <label for="movie">Movie:</label>
-        <select id="movie" name="movie_id" class="opened-list-styling" required>
-          <option value="">Select a movie</option>
-          <?php foreach ($movieMap as $mid => $mtitle): ?>
-            <option value="<?= htmlspecialchars($mid) ?>"><?= htmlspecialchars($mtitle) ?></option>
-          <?php endforeach; ?>
-        </select>
-
-        <label for="location">Location:</label>
-        <select id="location" name="location_id" class="opened-list-styling" required disabled>
-          <option value="">Select a cinema</option>
-        </select>
-
-        <label for="showtime">Showtime:</label>
-        <select id="showtime" name="session_id" class="opened-list-styling" required disabled>
-          <option value="">Select a showtime</option>
-        </select>
-
-        <button type="submit" class="buy-btn">Buy</button>
-      </form>
-    </div>
-  </aside>
 
   <script>
     const SESSIONS = <?= json_encode($sessions, JSON_UNESCAPED_UNICODE) ?>;

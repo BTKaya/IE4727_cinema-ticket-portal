@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---- helper to (re)build menu for a given select ----
     function rebuildDropdownFromSelect(select) {
         const entry = DROPDOWNS.get(select.id);
-        if (!entry) return; // this select wasn't converted
+        if (!entry) return;
         const { trigger, menu } = entry;
 
         // rebuild menu items from current <option>s
@@ -30,17 +30,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document
         .querySelectorAll("select.opened-list-styling")
         .forEach((select) => {
-            // create wrapper
             const wrapper = document.createElement("div");
             wrapper.className = "dropdown";
 
-            // create trigger button
             const trigger = document.createElement("button");
             trigger.type = "button";
             trigger.className = "dropdown-trigger";
             wrapper.appendChild(trigger);
 
-            // create menu
             const menu = document.createElement("div");
             menu.className = "dropdown-menu";
             wrapper.appendChild(menu);
@@ -51,15 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
             parent.insertBefore(wrapper, select);
             wrapper.appendChild(select);
 
-            // store in registry
-            // NOTE: we need an id to rebuild later
+            // give id if missing
             if (!select.id) {
-                // give it a random id if it didn't have one
                 select.id = "sel-" + Math.random().toString(36).slice(2);
             }
             DROPDOWNS.set(select.id, { select, wrapper, trigger, menu });
 
-            // initial build
             rebuildDropdownFromSelect(select);
 
             // open/close
@@ -73,16 +67,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 const item = e.target.closest(".dropdown-item");
                 if (!item) return;
 
-                // visual select
                 menu.querySelectorAll(".dropdown-item").forEach((i) =>
                     i.classList.remove("is-selected")
                 );
                 item.classList.add("is-selected");
                 trigger.textContent = item.textContent;
 
-                // real select value
                 select.value = item.dataset.value;
-                // fire change so dependent selects work
                 select.dispatchEvent(new Event("change", { bubbles: true }));
 
                 wrapper.classList.remove("open");
@@ -114,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
         opt.value = "";
         opt.textContent = placeholder;
         sel.appendChild(opt);
-        // rebuild UI
         rebuildDropdownFromSelect(sel);
     }
 
@@ -143,13 +133,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        if (seenLocs.size > 0) {
-            locSel.disabled = false;
-        }
+        if (seenLocs.size > 0) locSel.disabled = false;
 
-        // rebuild UI for location
         rebuildDropdownFromSelect(locSel);
-        // keep showtime empty
         rebuildDropdownFromSelect(showSel);
     });
 
@@ -181,11 +167,56 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        if (showSel.options.length > 1) {
-            showSel.disabled = false;
-        }
-
-        // IMPORTANT: rebuild UI for showtime after adding options
+        if (showSel.options.length > 1) showSel.disabled = false;
         rebuildDropdownFromSelect(showSel);
     });
+
+    // =========================================================
+    // 3) handle form submission → go to movieDetail.php
+    // =========================================================
+
+    const form = document.getElementById("quickBuyForm");
+    if (form) {
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const movieId = movieSel.value;
+            const locationId = locSel.value;
+            const sessionId = showSel.value;
+
+            if (!movieId || !locationId || !sessionId) {
+                alert("Please select movie, location, and showtime.");
+                return;
+            }
+
+            // try to find full session info in the JS array
+            const sess = (window.SESSIONS || []).find(
+                (s) => String(s.session_id) === String(sessionId)
+            );
+
+            // ✅ CASE A — we found the session, send full info
+            if (sess) {
+                const date = sess.session_date;
+                const time = (sess.session_time || "").slice(0, 5);
+
+                const url =
+                    `movieDetail.php?id=${encodeURIComponent(movieId)}` +
+                    `&location_id=${encodeURIComponent(locationId)}` +
+                    `&date=${encodeURIComponent(date)}` +
+                    `&time=${encodeURIComponent(time)}` +
+                    `&session_id=${encodeURIComponent(sessionId)}`;
+
+                window.location.href = url;
+                return;
+            }
+
+            // ❗ CASE B — we DIDN'T find it in JS (your current situation)
+            // still pass the session_id so PHP can look it up
+            const fallbackUrl =
+                `movieDetail.php?id=${encodeURIComponent(movieId)}` +
+                `&location_id=${encodeURIComponent(locationId)}` +
+                `&session_id=${encodeURIComponent(sessionId)}`;
+            window.location.href = fallbackUrl;
+        });
+    }
 });
