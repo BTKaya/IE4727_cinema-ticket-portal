@@ -1,17 +1,177 @@
 <?php
-include 'db.php';
 session_start();
+require_once 'db.php';
+require_once 'assets/libs/fpdf.php';
+require_once 'generate_receipt.php';
 
-if (!isset($_POST['booking_ids'])) {
+// must be logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$user_id = (int) $_SESSION['user_id'];
+$booking_ids = $_POST['booking_ids'] ?? [];
+
+if (empty($booking_ids)) {
     echo "<script>alert('No bookings selected.'); window.location='cart.php';</script>";
     exit;
 }
 
-$booking_ids = $_POST['booking_ids'];
+// Get user email
+$user = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+$user->execute([$user_id]);
+$userEmail = $user->fetchColumn();
 
-$stmt = $pdo->prepare("UPDATE bookings SET status = 'checked_out' WHERE id = ?");
-foreach ($booking_ids as $bid) {
-    $stmt->execute([$bid]);
+// folder for PDF tickets
+$pdfDir = __DIR__ . "/tickets/";
+if (!file_exists($pdfDir)) {
+    mkdir($pdfDir, 0777, true);
 }
 
-echo "<script>alert('✅ Checkout successful! Your seats are now permanently booked.'); window.location='index.php';</script>";
+$bookingData = [];
+$totalPriceAll = 0;
+$ticketFiles = [];
+
+foreach ($booking_ids as $bid) {
+
+    // Fetch booking details
+    $stmt = $pdo->prepare("
+        SELECT b.*, m.title, l.name AS location_name
+        FROM bookings b
+        JOIN movies m ON b.movie_id = m.id
+        JOIN locations l ON b.location_id = l.id
+        WHERE b.id = ? AND b.user_id = ?
+    ");
+    $stmt->execute([$bid, $user_id]);
+    $b = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$b) continue;
+
+    $seats = implode(", ", json_decode($b['seats'], true));
+
+    $b['seats'] = $seats;
+    $bookingData[] = $b;
+    $totalPriceAll += $b['total_price'];
+
+    // Create PDF
+    $pdf = new FPDF('L', 'mm', array(210, 100));
+    $pdf->SetMargins(0, 0, 0);
+    $pdf->SetAutoPageBreak(false);
+    $pdf->AddPage();
+
+    // Background
+    $pdf->SetFillColor(0, 0, 0);
+    $pdf->Rect(0, 0, 210, 100, 'F');
+    $pdf->SetTextColor(255, 255, 255);
+
+    // ===== Logo =====
+    $logo = 'assets/images/luminaLogo.png';
+    if (file_exists($logo)) {
+        $pdf->Image($logo, (210 - 50) / 2, 6, 50);
+    }
+
+    // ===== Divider =====
+    $pdf->SetDrawColor(255, 255, 255);
+    $pdf->SetLineWidth(0.4);
+    $pdf->Line(30, 38, 180, 38);
+
+    // ===== Movie Title =====
+    $pdf->SetFont("Arial", "B", 18);
+    $pdf->SetXY(0, 42);
+    $pdf->Cell(210, 8, $b['title'], 0, 1, "C");
+
+    // ===== Divider =====
+    $pdf->Line(30, 54, 180, 54);
+
+    // ===== Location =====
+    $pdf->SetFont("Arial", "B", 14);
+    $pdf->SetXY(0, 58);
+    $pdf->Cell(210, 8, $b['location_name'], 0, 1, "C");
+
+    // ===== Info Row (Aligned Columns) =====
+    $pdf->SetFont("Arial", "", 12);
+
+    // Column positions (adjust to taste)
+    $xSeats = 35;
+    $xDate  = 95;
+    $xTime  = 155;
+    $yStart = 70;
+
+    // Labels (not bold)
+    $pdf->SetXY($xSeats, $yStart);
+    $pdf->Cell(40, 6, "Seats:", 0, 0, "L");
+
+    $pdf->SetXY($xDate, $yStart);
+    $pdf->Cell(40, 6, "Date:", 0, 0, "L");
+
+    $pdf->SetXY($xTime, $yStart);
+    $pdf->Cell(40, 6, "Time:", 0, 1, "L");
+
+    // Values (bold)
+    $pdf->SetFont("Arial", "B", 12);
+
+    $pdf->SetXY($xSeats, $yStart + 7);
+    $pdf->Cell(40, 6, $seats, 0, 0, "L");
+
+    $pdf->SetXY($xDate, $yStart + 7);
+    $pdf->Cell(40, 6, $b['screening_date'], 0, 0, "L");
+
+    $pdf->SetXY($xTime, $yStart + 7);
+    $pdf->Cell(40, 6, substr($b['screening_time'], 0, 5), 0, 1, "L");
+
+
+    // ===== Price (Spaced) =====
+    $pdf->Ln(4);
+    $pdf->SetFont("Arial", "", 12);
+    $pdf->Cell(210, 8, "Paid: $" . number_format($b['total_price'], 2), 0, 1, "C");
+
+    $pdf->Ln(3);
+
+    // Save
+    $ticketFile = $pdfDir . "ticket_" . $b['id'] . ".pdf";
+    $pdf->Output("F", $ticketFile);
+
+    $ticketFiles[] = $ticketFile;
+
+    // Mark booking as completed
+    $update = $pdo->prepare("UPDATE bookings SET status = 'checked_out' WHERE id = ?");
+    $update->execute([$bid]);
+}
+
+// ✅ Generate Receipt
+$receiptFile = $pdfDir . "receipt_" . time() . "_" . $user_id . ".pdf";
+generateReceiptPDF($bookingData, $totalPriceAll, $receiptFile);
+
+// ✅ Send Email with attachments
+$to = $userEmail;
+$from = "lumina@localhost";
+$subject = "Your Lumina Cinema Booking Confirmation";
+$message = "Your tickets are attached.\nEnjoy your movie!\n\n-Lumina Cinema";
+
+$boundary = md5(time());
+$headers = "From: $from\r\n";
+$headers .= "MIME-Version: 1.0\r\n";
+$headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
+
+$body = "--$boundary\r\n";
+$body .= "Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n";
+$body .= $message . "\r\n\r\n";
+
+$attachments = array_merge([$receiptFile], $ticketFiles);
+
+foreach ($attachments as $file) {
+    $fileName = basename($file);
+    $fileData = chunk_split(base64_encode(file_get_contents($file)));
+    $body .= "--$boundary\r\n";
+    $body .= "Content-Type: application/pdf; name=\"$fileName\"\r\n";
+    $body .= "Content-Disposition: attachment; filename=\"$fileName\"\r\n";
+    $body .= "Content-Transfer-Encoding: base64\r\n\r\n";
+    $body .= $fileData . "\r\n\r\n";
+}
+
+$body .= "--$boundary--";
+
+mail($to, $subject, $body, $headers);
+
+echo "<script>alert('✅ Checkout successful! Tickets emailed.'); window.location='index.php';</script>";
