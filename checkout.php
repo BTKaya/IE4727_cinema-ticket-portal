@@ -81,14 +81,14 @@ foreach ($booking_ids as $bid) {
 
 
     // Create PDF
-    $pdf = new FPDF('L', 'mm', array(210, 100));
+    $pdf = new FPDF('L', 'mm', array(210, 110));
     $pdf->SetMargins(0, 0, 0);
     $pdf->SetAutoPageBreak(false);
     $pdf->AddPage();
 
     // Background
     $pdf->SetFillColor(0, 0, 0);
-    $pdf->Rect(0, 0, 210, 100, 'F');
+    $pdf->Rect(0, 0, 210, 110, 'F');
     $pdf->SetTextColor(255, 255, 255);
 
     // ===== Logo =====
@@ -118,43 +118,52 @@ foreach ($booking_ids as $bid) {
     // ===== Info Row (Aligned Columns) =====
     $pdf->SetFont("Arial", "", 12);
 
-    // Column positions (adjust to taste)
-    $xSeats = 35;
-    $xDate  = 95;
-    $xTime  = 155;
-    $yStart = 70;
+    // Column positions
+    $xSeats = 35;     // seats label + values column
+    $xDate  = 95;     // date column
+    $xTime  = 155;    // time column
+    $yStart = 70;     // top of the labels row
+    $lineH  = 6;
 
-    // Labels (not bold)
-    $pdf->SetFont("Arial", "B", 12);
-    $yPos = $yStart + 7;
-
-    foreach ($seatsWrapped as $line) {
-        $pdf->SetXY($xSeats, $yPos);
-        $pdf->Cell(40, 6, $line, 0, 0, "L");
-        $yPos += 6; // move down for next line
-    }
-
+    // ---- Labels row (one line) ----
+    $pdf->SetXY($xSeats, $yStart);
+    $pdf->Cell(40, $lineH, "Seats:", 0, 0, "L");
 
     $pdf->SetXY($xDate, $yStart);
-    $pdf->Cell(40, 6, "Date:", 0, 0, "L");
+    $pdf->Cell(40, $lineH, "Date:", 0, 0, "L");
 
     $pdf->SetXY($xTime, $yStart);
-    $pdf->Cell(40, 6, "Time:", 0, 1, "L");
+    $pdf->Cell(40, $lineH, "Time:", 0, 1, "L");
 
-    // Values (bold)
+    // ---- Values row ----
+    $valuesY = $yStart + 7; // start values just below labels
+
+    // Seats (wrapped, under "Seats:")
     $pdf->SetFont("Arial", "B", 12);
+    $yPos = $valuesY;
+    foreach ($seatsWrapped as $line) {
+        $pdf->SetXY($xSeats, $yPos);
+        $pdf->Cell(60, $lineH, $line, 0, 1, "L");
+        $yPos += $lineH;
+    }
 
-    $pdf->SetXY($xDate, $yStart + 7);
-    $pdf->Cell(40, 6, $b['screening_date'], 0, 0, "L");
+    // Date value (single line)
+    $pdf->SetXY($xDate, $valuesY);
+    $pdf->Cell(40, $lineH, $b['screening_date'], 0, 1, "L");
 
-    $pdf->SetXY($xTime, $yStart + 7);
-    $pdf->Cell(40, 6, substr($b['screening_time'], 0, 5), 0, 1, "L");
+    // Time value (single line)
+    $pdf->SetXY($xTime, $valuesY);
+    $pdf->Cell(40, $lineH, substr($b['screening_time'], 0, 5), 0, 1, "L");
+
+    // Compute the lower edge of this block (max of seats block vs date/time line)
+    $blockBottomY = max($yPos, $valuesY + $lineH);
 
 
     // ===== Price (Spaced) =====
-    $pdf->Ln(4);
-    $pdf->SetFont("Arial", "", 12);
-    $pdf->Cell(210, 8, "Paid: $" . number_format($b['total_price'], 2), 0, 1, "C");
+    $pdf->SetFont("Arial", "B", 12);
+    $paidY = $blockBottomY + 6;          // push down a bit
+    $pdf->SetXY($xTime, $paidY);
+    $pdf->Cell(50, 8, "Paid: $" . number_format($b['total_price'], 2), 0, 1, "R");
 
     $pdf->Ln(3);
 
