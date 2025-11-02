@@ -3,6 +3,7 @@ session_start();
 require_once 'db.php';
 require_once 'assets/libs/fpdf.php';
 require_once 'generate_receipt.php';
+require_once 'email_template.php';
 
 // must be logged in
 if (!isset($_SESSION['user_id'])) {
@@ -48,11 +49,36 @@ foreach ($booking_ids as $bid) {
 
     if (!$b) continue;
 
-    $seats = implode(", ", json_decode($b['seats'], true));
+    $seatArray = json_decode($b['seats'], true);
+    $seatArray = is_array($seatArray) ? $seatArray : [$seatArray];
 
-    $b['seats'] = $seats;
-    $bookingData[] = $b;
+    // Break into lines of max 5 seats each
+    $seatLines = array_chunk($seatArray, 5);
+    $seatsWrapped = array_map(fn($chunk) => implode(", ", $chunk), $seatLines);
+
+
+    $seatArray = json_decode($b['seats'], true);
+    $seatArray = is_array($seatArray) ? $seatArray : [$seatArray];
+
+    // Save original for receipt + email
+    $b['seats'] = implode(", ", $seatArray);
+
+    // Create wrapped version only for ticket PDF
+    $seatLines = array_chunk($seatArray, 5);
+    $seatsWrapped = array_map(fn($chunk) => implode(", ", $chunk), $seatLines);
+
+    // Prepare table data for receipt & email
+    $bookingData[] = [
+        'title' => $b['title'],
+        'location_name' => $b['location_name'],
+        'seats' => $b['seats'], // already the readable version
+        'screening_date' => $b['screening_date'],
+        'screening_time' => substr($b['screening_time'], 0, 5),
+        'total_price' => $b['total_price']
+    ];
+
     $totalPriceAll += $b['total_price'];
+
 
     // Create PDF
     $pdf = new FPDF('L', 'mm', array(210, 100));
@@ -99,8 +125,15 @@ foreach ($booking_ids as $bid) {
     $yStart = 70;
 
     // Labels (not bold)
-    $pdf->SetXY($xSeats, $yStart);
-    $pdf->Cell(40, 6, "Seats:", 0, 0, "L");
+    $pdf->SetFont("Arial", "B", 12);
+    $yPos = $yStart + 7;
+
+    foreach ($seatsWrapped as $line) {
+        $pdf->SetXY($xSeats, $yPos);
+        $pdf->Cell(40, 6, $line, 0, 0, "L");
+        $yPos += 6; // move down for next line
+    }
+
 
     $pdf->SetXY($xDate, $yStart);
     $pdf->Cell(40, 6, "Date:", 0, 0, "L");
@@ -110,9 +143,6 @@ foreach ($booking_ids as $bid) {
 
     // Values (bold)
     $pdf->SetFont("Arial", "B", 12);
-
-    $pdf->SetXY($xSeats, $yStart + 7);
-    $pdf->Cell(40, 6, $seats, 0, 0, "L");
 
     $pdf->SetXY($xDate, $yStart + 7);
     $pdf->Cell(40, 6, $b['screening_date'], 0, 0, "L");
@@ -147,22 +177,29 @@ generateReceiptPDF($bookingData, $totalPriceAll, $receiptFile);
 $to = $userEmail;
 $from = "lumina@localhost";
 $subject = "Your Lumina Cinema Booking Confirmation";
-$message = "Your tickets are attached.\nEnjoy your movie!\n\n-Lumina Cinema";
 
-$boundary = md5(time());
+$htmlMessage = buildEmailHTML($bookingData, $totalPriceAll);
+
+// ✅ Build email
+$boundary = "==Multipart_Boundary_x" . md5(time()) . "x";
+
 $headers = "From: $from\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
 
+// ✅ Email Body (HTML)
 $body = "--$boundary\r\n";
-$body .= "Content-Type: text/plain; charset=\"UTF-8\"\r\n\r\n";
-$body .= $message . "\r\n\r\n";
+$body .= "Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n";
+$body .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
+$body .= $htmlMessage . "\r\n\r\n";
 
+// ✅ Attach Receipt & Tickets
 $attachments = array_merge([$receiptFile], $ticketFiles);
 
 foreach ($attachments as $file) {
     $fileName = basename($file);
     $fileData = chunk_split(base64_encode(file_get_contents($file)));
+
     $body .= "--$boundary\r\n";
     $body .= "Content-Type: application/pdf; name=\"$fileName\"\r\n";
     $body .= "Content-Disposition: attachment; filename=\"$fileName\"\r\n";
@@ -172,6 +209,8 @@ foreach ($attachments as $file) {
 
 $body .= "--$boundary--";
 
+// ✅ Send Mail
 mail($to, $subject, $body, $headers);
+
 
 echo "<script>alert('✅ Checkout successful! Tickets emailed.'); window.location='index.php';</script>";
