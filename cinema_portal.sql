@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 03, 2025 at 08:03 PM
+-- Generation Time: Nov 03, 2025 at 08:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -2876,8 +2876,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password_hash`, `username`, `created_at`) VALUES
-(0, 'test@example.com', 'testerpassword', 'tester', '2025-10-27 11:58:28'),
-(2, 'xiayuehan@gmail.com', '$2y$10$yJrnprg72c9Ht/q/NkZH6edWKJp6mFEmsAxWSJnNJJZIWgjbp9IbW', 'Nepexe', '2025-10-30 14:17:41');
+(2, 'xiayuehan@gmail.com', '$2y$10$yJrnprg72c9Ht/q/NkZH6edWKJp6mFEmsAxWSJnNJJZIWgjbp9IbW', 'Nepexe', '2025-10-30 14:17:41'),
+(3, 'Tester1@localhost', '$2y$10$bvNQXqqu2cSbYvUN.EuMZuxJ6rk8fYfkLks8rqHZoFR5Z8ikP4M7S', 'Tester1', '2025-11-03 19:08:28');
 
 --
 -- Indexes for dumped tables
@@ -2964,7 +2964,7 @@ ALTER TABLE `sessions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
