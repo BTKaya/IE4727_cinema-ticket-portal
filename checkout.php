@@ -158,5 +158,6 @@ foreach ($attachments as $file) {
     $body .= $fileData . "\r\n\r\n";
 }
 $body .= "--$boundary--";
-mail($to, $subject, $body, $headers);
 echo "<script>alert('Checkout successful! Tickets emailed.'); window.location='index.php';</script>";
+mail($to, $subject, $body, $headers);
+
