@@ -73,7 +73,12 @@ $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php endforeach; ?>
 
     <div class="confirm-checkout-wrap">
-      <a href="checkout.php" class="checkout-btn">Confirm Checkout</a>
+      <form action="checkout.php" method="POST">
+        <?php foreach ($bookings as $b): ?>
+          <input type="hidden" name="booking_ids[]" value="<?= $b['id']; ?>">
+        <?php endforeach; ?>
+        <button type="submit" class="checkout-btn">Confirm Checkout</button>
+      </form>
     </div>
 
   <?php endif; ?>

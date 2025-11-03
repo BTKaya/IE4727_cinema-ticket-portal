@@ -20,8 +20,15 @@ if (!is_array($seats)) {
     $seats = [$seats];
 }
 
-$user_id = $_SESSION['user_id'];
+/**
+ * 2. User handling, replaced
+ */
+if (!isset($_SESSION['user_id'])) {
+    echo "<script>alert('Please log in before booking seats.'); window.location='account.php';</script>";
+    exit;
+}
 
+$user_id = (int) $_SESSION['user_id'];
 
 $sessionStmt = $pdo->prepare("
     SELECT s.id,
