@@ -55,17 +55,17 @@ $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <h2><?= htmlspecialchars($b['title']); ?></h2>
 
-        <p><strong>Date:</strong> <?= $b['screening_date']; ?></p>
-        <p><strong>Time:</strong> <?= substr($b['screening_time'], 0, 5); ?></p>
+        <p><strong>Date:</strong> <?= htmlspecialchars($b['screening_date']); ?></p>
+        <p><strong>Time:</strong> <?= htmlspecialchars(substr($b['screening_time'], 0, 5)); ?></p>
 
         <p><strong>Seats:</strong>
-          <?= implode(", ", json_decode($b['seats'], true)); ?>
+          <?= htmlspecialchars($b['seats']); ?>
         </p>
 
         <p class="price"><strong>Total:</strong> $ <?= number_format($b['total_price'], 2); ?></p>
 
         <form method="post" action="remove_booking.php">
-          <input type="hidden" name="booking_id" value="<?= $b['id']; ?>">
+          <input type="hidden" name="booking_id" value="<?= (int) $b['id']; ?>">
           <button class="remove-btn">Remove</button>
         </form>
 
@@ -75,7 +75,7 @@ $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="confirm-checkout-wrap">
       <form action="checkout.php" method="POST">
         <?php foreach ($bookings as $b): ?>
-          <input type="hidden" name="booking_ids[]" value="<?= $b['id']; ?>">
+          <input type="hidden" name="booking_ids[]" value="<?= (int) $b['id']; ?>">
         <?php endforeach; ?>
         <button type="submit" class="checkout-btn">Confirm Checkout</button>
       </form>

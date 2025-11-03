@@ -157,7 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return [...offenders];
     }
 
-    // ---------- Confirm booking (no JSON; standard POST) ----------
     if (confirmBtn) {
         confirmBtn.addEventListener("click", (e) => {
             e.preventDefault();

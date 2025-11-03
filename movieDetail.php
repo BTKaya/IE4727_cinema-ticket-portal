@@ -78,7 +78,7 @@ if (!$session_id && $movie_id && $date && $time && $location_id) {
   $session_id = (int) ($sessStmt2->fetchColumn() ?: 0);
 }
 
-/* ======== Fetch booked seats from sessions.booked_seats (CSV; no JSON) ======== */
+/* ======== Fetch booked seats from sessions.booked_seats ======== */
 function parseSeatList(string $s): array
 {
   if ($s === '')
