@@ -65,6 +65,7 @@ foreach ($sessions as $s) {
   <?php include 'menu.php'; ?>
 
   <main class="hero-wrap">
+    <div class="movie-summary-box"></div>
     <aside class="popular-list">
       <ul id="popular">
         <?php foreach ($filteredMovies as $i => $m): ?>
@@ -78,7 +79,7 @@ foreach ($sessions as $s) {
       </ul>
     </aside>
 
-    <div class="movie-summary-box"></div>
+    
 
     <section class="carousel" id="carousel">
       <div class="slides">

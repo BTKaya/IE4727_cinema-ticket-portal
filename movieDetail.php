@@ -91,13 +91,20 @@ function parseSeatList(string $s): array
 }
 
 $bookedSeats = [];
+$heldSeats = [];
+$unavailableSeats = [];
+
 if ($session_id > 0) {
-  $q = $pdo->prepare("SELECT booked_seats FROM sessions WHERE id = ? LIMIT 1");
+  $q = $pdo->prepare("SELECT booked_seats, held_seats FROM sessions WHERE id = ? LIMIT 1");
   $q->execute([$session_id]);
-  $csv = (string) ($q->fetchColumn() ?: '');
-  $bookedSeats = parseSeatList($csv);
+  $row = $q->fetch(PDO::FETCH_ASSOC);
+
+  $bookedSeats = parseSeatList($row['booked_seats'] ?? '');
+  $heldSeats = parseSeatList($row['held_seats'] ?? '');
+
+  $unavailableSeats = array_unique(array_merge($bookedSeats, $heldSeats));
 }
-/* ============================================================================ */
+
 
 $rows = range('A', 'H');
 ?>
@@ -188,7 +195,7 @@ $rows = range('A', 'H');
           $seats = ($layout == 1) ? range(1, 8) : range(1, 10);
           foreach ($seats as $i):
             $seat_id = $r . $i;
-            $class = in_array($seat_id, $bookedSeats) ? "seat booked" : "seat available";
+            $class = in_array($seat_id, $unavailableSeats) ? "seat booked" : "seat available";
             echo "<div class='$class' data-seat='$seat_id'></div>";
 
             if ($layout == 1 && in_array($i, [2, 4, 6]))

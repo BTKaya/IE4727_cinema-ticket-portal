@@ -44,6 +44,24 @@ foreach ($booking_ids as $bid) {
     if (!$b)
         continue;
 
+    $sid = (int)$b['session_id'];
+    $seats = array_filter(array_map('trim', explode(',', $b['seats'])));
+
+    $hStmt = $pdo->prepare("SELECT held_seats FROM sessions WHERE id = ?");
+    $hStmt->execute([$sid]);
+    $hCurrent = array_filter(array_map('trim', explode(',', $hStmt->fetchColumn() ?: '')));
+    $hNew = implode(",", array_diff($hCurrent, $seats));
+    $pdo->prepare("UPDATE sessions SET held_seats = ? WHERE id = ?")
+        ->execute([$hNew, $sid]);
+
+    $bStmt = $pdo->prepare("SELECT booked_seats FROM sessions WHERE id = ?");
+    $bStmt->execute([$sid]);
+    $bCurrent = array_filter(array_map('trim', explode(',', $bStmt->fetchColumn() ?: '')));
+    $bNew = implode(",", array_unique(array_merge($bCurrent, $seats)));
+    $pdo->prepare("UPDATE sessions SET booked_seats = ? WHERE id = ?")
+        ->execute([$bNew, $sid]);
+
+
     $seats = trim($b['seats'], '[]"');
     $seats = str_replace('","', ', ', $seats);
     $seatArray = explode(', ', $seats);

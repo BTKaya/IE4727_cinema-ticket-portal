@@ -86,7 +86,7 @@ if (!empty($conflicts)) {
     exit;
 }
 
-$seatsForDb = '["' . implode('","', $seats) . '"]';
+$seatsForDb = implode(',', $seats);
 
 $insertSql = "
     INSERT INTO bookings
@@ -109,6 +109,23 @@ try {
         $price_per_seat,
         $total_price
     ]);
+
+    $sessionSeatsStmt = $pdo->prepare("SELECT held_seats FROM sessions WHERE id = ?");
+    $sessionSeatsStmt->execute([$session_id]);
+    $current = trim((string)$sessionSeatsStmt->fetchColumn());
+
+    if ($current === "") {
+        $updated = $seats;
+    } else {
+        $existing = array_values(array_unique(array_filter(array_map('trim', explode(', ', $current)))));
+        $updated = array_values(array_unique(array_merge($existing, $seats)));
+    }
+
+    $finalCsv = implode(",", $updated);
+
+    $updateSeatsStmt = $pdo->prepare("UPDATE sessions SET held_seats = ? WHERE id = ?");
+    $updateSeatsStmt->execute([$finalCsv, $session_id]);
+
     header("Location: cart.php?status=success");
     exit;
 } catch (Exception $e) {

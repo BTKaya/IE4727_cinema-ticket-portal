@@ -284,3 +284,57 @@ document.addEventListener("DOMContentLoaded", () => {
         sel.addEventListener("blur", () => sel.classList.remove("open"));
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const slides = document.querySelectorAll(".slideshow-image");
+    const movieLinks = document.querySelectorAll(".movie-name");
+    const summaryBox = document.querySelector(".movie-summary-box");
+
+    let current = 0;
+    let autoRotate = true;
+
+    function positionSummaryBox() {
+        const firstMovie = document.querySelector(".popular-list .movie-name");
+        if (!firstMovie || !summaryBox) return;
+
+        const rect = firstMovie.getBoundingClientRect();
+        const offset = window.scrollY || document.documentElement.scrollTop;
+
+        summaryBox.style.top = (rect.top + offset - summaryBox.offsetHeight - 20) + "px";
+    }
+
+    window.addEventListener("resize", positionSummaryBox);
+
+    function showSlide(index) {
+        slides.forEach((s, i) => s.classList.toggle("active", i === index));
+        current = index;
+        positionSummaryBox();
+    }
+
+    let interval = setInterval(() => {
+        if (autoRotate) {
+            showSlide((current + 1) % slides.length);
+        }
+    }, 5000);
+
+    movieLinks.forEach(link => {
+        link.addEventListener("mouseenter", () => {
+            autoRotate = false;
+            let index = parseInt(link.dataset.index, 10);
+            showSlide(index);
+
+            if (summaryBox) {
+                summaryBox.innerHTML = `
+                    <h3>${link.textContent}</h3>
+                    <p>${link.dataset.summary || ""}</p>
+                `;
+                summaryBox.classList.add("visible");
+            }
+        });
+
+        link.addEventListener("mouseleave", () => {
+            autoRotate = true;
+            if (summaryBox) summaryBox.classList.remove("visible");
+        });
+    });
+});

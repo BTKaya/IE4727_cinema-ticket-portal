@@ -347,14 +347,19 @@ option:hover {
     background-size: cover;
     background-position: center;
     opacity: 0;
-    animation: fadeSlideshow 18s infinite;
+    /* animation: fadeSlideshow 18s infinite; */
     z-index: 1;
     object-fit: cover;
     object-position: center;
+    transition: opacity 0.8s ease;
+}
+
+.slideshow-image.active {
+    opacity: 1;
 }
 
 /* Fade timing for 3 slides */
-.slideshow-image:nth-child(1) {
+/* .slideshow-image:nth-child(1) {
     animation-delay: 0s;
 }
 .slideshow-image:nth-child(2) {
@@ -362,10 +367,10 @@ option:hover {
 }
 .slideshow-image:nth-child(3) {
     animation-delay: 12s;
-}
+} */
 
 /* Smooth fade animation */
-@keyframes fadeSlideshow {
+/* @keyframes fadeSlideshow {
     0% {
         opacity: 0;
     }
@@ -381,7 +386,7 @@ option:hover {
     100% {
         opacity: 0;
     }
-}
+} */
 
 /* DARK FADE FOR READABILITY */
 .hero-wrap::before {
@@ -459,10 +464,8 @@ option:hover {
 /* ================= SUMMARY BOX ================= */
 .movie-summary-box {
     position: absolute;
-    top: 50%;
-    right: 5%;
-    transform: translateY(-50%);
-    width: 380px;
+    left: 5%;
+    width: 420px;
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(6px);
     padding: 24px 28px;
@@ -476,7 +479,7 @@ option:hover {
 
 .movie-summary-box.visible {
     opacity: 1;
-    transform: translateY(-50%) translateY(0); /* stays centered, no vertical slide offset */
+    transform: translateY(0);
 }
 
 .movie-summary-box h3 {
@@ -1717,4 +1720,26 @@ button.buy-btn {
 
 .dropdown.open .dropdown-trigger::after {
     transform: translateY(-50%) rotate(180deg);
+}
+
+.timer-box {
+    float: right;
+    background: #111;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    border: 1px solid #444;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.5s ease;
+}
+
+.timer-countdown {
+    font-weight: 700;
+    min-width: 40px;
+    display: inline-block;
+    text-align: center;
+    transition: color 0.5s ease;
 }
