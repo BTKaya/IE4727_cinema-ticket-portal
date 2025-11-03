@@ -1,24 +1,18 @@
 <?php
 include 'db.php';
 
-// ---------------- FETCH BASE DATA ----------------
-
-// Get movie ID
+// --- Fetch movie and related data ---
 $movie_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+$location_id = isset($_GET['location_id']) ? (int) $_GET['location_id'] : 0;
 
-// Get location ID
-$location_id = isset($_GET['location_id']) ? (int) $_GET['location_id'] : 0; // ✅ updated for location_id
-
-// Get movie info
 $stmt = $pdo->prepare("SELECT * FROM movies WHERE id = ?");
 $stmt->execute([$movie_id]);
 $movie = $stmt->fetch(PDO::FETCH_ASSOC);
 $layout = $movie['location_type'] ?? 1;
 
-// Get Location info
 $stmt2 = $pdo->query("SELECT id, name FROM locations ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch sessions for this movie from sessions table
+// sessions for this movie
 $sessionsStmt = $pdo->prepare("
     SELECT id, session_date, session_time, location_id
     FROM sessions
@@ -30,7 +24,6 @@ $sessions = $sessionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $session_id = isset($_GET['session_id']) ? (int) $_GET['session_id'] : 0;
 
-// Create associative array of locations for JS
 $locationsById = [];
 foreach ($stmt2 as $loc) {
   $locationsById[$loc['id']] = $loc['name'];
@@ -39,29 +32,22 @@ foreach ($stmt2 as $loc) {
 include 'header.php';
 include 'menu.php';
 
-// ---------------- VALIDATE MOVIE ----------------
 if (!$movie) {
   echo "<div class='movie-page'><p>Movie not found.</p></div>";
   include 'footer.php';
   exit;
 }
 
-// Determine selected date, time & location
 $date = $_GET['date'] ?? "";
 $time = $_GET['time'] ?? "";
 $location = $_GET['location'] ?? "";
 
-// If location_id is provided, find its name
-if ($location_id != 0) {
-  foreach ($stmt2 as $loc) {
-    if ((int) $loc['id'] === (int) $location_id) {
-      $location = $loc['name'];
-      break;
-    }
-  }
+// Resolve location name from ID
+if ($location_id != 0 && isset($locationsById[$location_id])) {
+  $location = $locationsById[$location_id];
 }
 
-// if session_id is provided, we can derive date/time/location from the DB
+// If session_id provided, pull authoritative data
 if ($session_id) {
   $sessStmt = $pdo->prepare("
       SELECT movie_id, location_id, session_date, session_time
@@ -71,27 +57,37 @@ if ($session_id) {
   ");
   $sessStmt->execute([$session_id]);
   $sessRow = $sessStmt->fetch(PDO::FETCH_ASSOC);
-
   if ($sessRow) {
-    // override with authoritative values from DB
-    $movie_id = (int) $sessRow['movie_id'];     // safe to overwrite
+    $movie_id = (int) $sessRow['movie_id'];
     $location_id = (int) $sessRow['location_id'];
     $date = $sessRow['session_date'];
-    $time = substr($sessRow['session_time'], 0, 5); // "19:00:00" -> "19:00"
+    $time = substr($sessRow['session_time'], 0, 5);
   }
 }
 
+if (!$session_id && $movie_id && $date && $time && $location_id) {
+  $sessStmt2 = $pdo->prepare("
+      SELECT id FROM sessions
+      WHERE movie_id = ?
+        AND location_id = ?
+        AND session_date = ?
+        AND (session_time = ? OR session_time LIKE CONCAT(?, ':__'))
+      LIMIT 1
+  ");
+  $sessStmt2->execute([$movie_id, $location_id, $date, $time, $time]);
+  $session_id = (int) ($sessStmt2->fetchColumn() ?: 0);
+}
 
-// ---------------- FETCH BOOKED SEATS ----------------
+// Fetch booked seats
 $bookedSeats = [];
-if ($date && $time && $location_id) { // ✅ use location_id, not location
+if ($date && $time && $location_id) {
   $seatQuery = $pdo->prepare("
     SELECT seats
     FROM bookings
     WHERE movie_id = ?
       AND screening_date = ?
       AND screening_time = ?
-      AND location_id = ?  -- ✅ updated for location_id
+      AND location_id = ?
       AND status IN ('pending','confirmed')
   ");
   $seatQuery->execute([$movie_id, $date, $time, $location_id]);
@@ -99,21 +95,15 @@ if ($date && $time && $location_id) { // ✅ use location_id, not location
 
   foreach ($rows as $r) {
     $taken = json_decode($r['seats'], true);
-    if (is_array($taken)) {
-      foreach ($taken as $s) {
-        $bookedSeats[] = $s;
-      }
-    }
+    if (is_array($taken))
+      $bookedSeats = array_merge($bookedSeats, $taken);
   }
 }
 
-// Seat layout config
 $rows = range('A', 'H');
 ?>
 
-<!---------------- MOVIE DETAILS ---------------->
 <div class="movie-page">
-
   <h1><?= htmlspecialchars($movie['title']); ?></h1>
 
   <div class="movie-info">
@@ -141,14 +131,10 @@ $rows = range('A', 'H');
       </tr>
       <tr>
         <th>Trailer:</th>
-        <td>
-          <a href="<?= htmlspecialchars($movie['trailer_url']); ?>" target="_blank" class="trailer-link">
-            Watch on YouTube
-          </a>
-        </td>
+        <td><a href="<?= htmlspecialchars($movie['trailer_url']); ?>" target="_blank" class="trailer-link">Watch on
+            YouTube</a></td>
       </tr>
     </table>
-
   </div>
 
   <hr>
@@ -157,24 +143,42 @@ $rows = range('A', 'H');
     <label>Date:</label>
     <select id="screening_date">
       <option value="">-- Select --</option>
+      <?php
+      $uniqueDates = [];
+      foreach ($sessions as $s) {
+        if (!in_array($s['session_date'], $uniqueDates)) {
+          $uniqueDates[] = $s['session_date'];
+          echo "<option value='{$s['session_date']}'>{$s['session_date']}</option>";
+        }
+      }
+      ?>
     </select>
 
     <label style="margin-left:1rem;">Time:</label>
     <select id="screening_time">
       <option value="">-- Select --</option>
+      <?php
+      foreach ($sessions as $s) {
+        $timeShort = substr($s['session_time'], 0, 5);
+        echo "<option value='{$timeShort}' data-date='{$s['session_date']}' data-loc='{$s['location_id']}'>{$timeShort}</option>";
+      }
+      ?>
     </select>
 
     <label style="margin-left:1rem;">Location:</label>
     <select id="location">
       <option value="">-- Select --</option>
+      <?php
+      foreach ($locationsById as $id => $name) {
+        echo "<option value='{$id}'>{$name}</option>";
+      }
+      ?>
     </select>
   </div>
 
-  <!---------------- SEAT MAP ---------------->
-  <?php if ($date && $time && $location_id): // ✅ changed to location_id ?>
+  <?php if ($date && $time && $location_id): ?>
     <hr>
     <h2 class="choose-seats-title">Select Your Seats</h2>
-
     <div class="screen-label">SCREEN</div>
 
     <div class="seat-container">
@@ -223,7 +227,6 @@ $rows = range('A', 'H');
   <?php endif; ?>
 </div>
 
-<!-- Popup Overlay -->
 <div id="popup-overlay" class="popup-overlay">
   <div class="popup-box">
     <h2 id="popup-title"></h2>
@@ -235,16 +238,11 @@ $rows = range('A', 'H');
   </div>
 </div>
 
-<!-- Pass PHP variables to JS -->
-<script>
-  window.SESSIONS = <?= json_encode($sessions) ?>;
-  window.LOCATIONS = <?= json_encode($locationsById) ?>;
-  window.MOVIE_ID = <?= (int) $movie_id ?>;
-  window.INIT_DATE = "<?= $date ?>";
-  window.INIT_TIME = "<?= $time ?>";
-  window.INIT_LOC = "<?= $location ?>";
-  window.INIT_LOC_ID = <?= (int) $location_id ?>; // ✅ added for clarity
-</script>
+<input type="hidden" id="movieId" value="<?= $movie_id ?>">
+<input type="hidden" id="initDate" value="<?= $date ?>">
+<input type="hidden" id="initTime" value="<?= $time ?>">
+<input type="hidden" id="initLocation" value="<?= $location_id ?>">
+<input type="hidden" id="sessionId" value="<?= $session_id ?>">
 
 <script src="movieDetail.js" defer></script>
 <?php include 'footer.php'; ?>

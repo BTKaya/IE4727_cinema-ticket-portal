@@ -1,159 +1,180 @@
-// js/movie-detail.js
-
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. read data passed from PHP (in movieDetail.php)
-    const SESSIONS = window.SESSIONS || [];
-    const LOCATIONS = window.LOCATIONS || {}; // { 1: "Downtown", 2: "City Mall" }
-    const MOVIE_ID = window.MOVIE_ID;
-
-    // possible preselected values (from query string)
-    const INIT_DATE = window.INIT_DATE || "";
-    const INIT_TIME = window.INIT_TIME || "";
-    const INIT_LOC = window.INIT_LOC || "";
-    const INIT_LOC_ID = window.INIT_LOC_ID || null; // we added this in PHP
-
-    // 2. get DOM refs
     const dateSel = document.getElementById("screening_date");
     const timeSel = document.getElementById("screening_time");
     const locSel = document.getElementById("location");
 
-    if (!dateSel || !timeSel || !locSel) {
-        // page doesn't have the selects (safety)
-        return;
+    if (!dateSel || !timeSel || !locSel) return;
+
+    // Hidden inputs from PHP
+    const MOVIE_ID = document.getElementById("movieId")?.value || "";
+    const INIT_DATE = document.getElementById("initDate")?.value || "";
+    const INIT_TIME = document.getElementById("initTime")?.value || "";
+    const INIT_LOCID = document.getElementById("initLocation")?.value || "";
+    const SESSION_ID = document.getElementById("sessionId")?.value || "";
+
+    // Save original options for rebuilding
+    const originalTimeOptions = [...timeSel.options].map((o) =>
+        o.cloneNode(true)
+    );
+    const originalLocOptions = [...locSel.options].map((o) =>
+        o.cloneNode(true)
+    );
+
+    function normalizeTime(t) {
+        return (t || "").slice(0, 5);
     }
 
-    // 3. build unique date list from sessions
-    // SESSIONS shape: [{id: 5, session_date: "2025-11-04", session_time: "09:00:00", location_id: 2}, ...]
-    const uniqueDates = [...new Set(SESSIONS.map((s) => s.session_date))];
-
-    // ----- helper: populate dates -----
-    function populateDates(selected = "") {
-        dateSel.innerHTML = '<option value="">-- Select --</option>';
-        uniqueDates.forEach((d) => {
-            const opt = document.createElement("option");
-            opt.value = d;
-            opt.textContent = d;
-            if (d === selected) {
-                opt.selected = true;
-            }
-            dateSel.appendChild(opt);
-        });
+    function rebuildSelect(selectEl, optionsClones) {
+        const placeholder =
+            selectEl.options[0]?.cloneNode(true) ||
+            new Option("-- Select --", "");
+        selectEl.innerHTML = "";
+        selectEl.appendChild(placeholder);
+        optionsClones.forEach((clone) => selectEl.appendChild(clone));
+        selectEl.selectedIndex = 0;
+        selectEl.disabled = optionsClones.length === 0;
     }
 
-    // ----- helper: given a date → get times -----
-    function getTimesForDate(d) {
-        return [
-            ...new Set(
-                SESSIONS.filter((s) => s.session_date === d).map((s) =>
-                    s.session_time.slice(0, 5)
-                ) // "09:00:00" → "09:00"
-            ),
-        ];
-    }
-
-    // ----- helper: given date+time → get location ids -----
-    function getLocationsForDateTime(d, t) {
-        return [
-            ...new Set(
-                SESSIONS.filter(
-                    (s) => s.session_date === d && s.session_time.startsWith(t)
-                ).map((s) => s.location_id)
-            ),
-        ];
-    }
-
-    // ----- helper: populate times -----
-    function populateTimes(d, selected = "") {
-        timeSel.innerHTML = '<option value="">-- Select --</option>';
-        if (!d) return;
-        const times = getTimesForDate(d);
-        times.forEach((t) => {
-            const opt = document.createElement("option");
-            opt.value = t;
-            opt.textContent = t;
-            if (t === selected) {
-                opt.selected = true;
-            }
-            timeSel.appendChild(opt);
-        });
-    }
-
-    // ----- helper: populate locations -----
-    function populateLocations(d, t, selectedName = "") {
-        locSel.innerHTML = '<option value="">-- Select --</option>';
-        if (!d || !t) return;
-        const locIds = getLocationsForDateTime(d, t);
-        locIds.forEach((id) => {
-            const name = LOCATIONS[id];
-            if (!name) return;
-            const opt = document.createElement("option");
-            opt.value = name; // we still show NAME to user
-            opt.textContent = name;
-            if (name === selectedName) {
-                opt.selected = true;
-            }
-            locSel.appendChild(opt);
-        });
-    }
-
-    // ----- helper: redirect when all 3 selected -----
-    function redirectIfComplete() {
-        const d = dateSel.value;
-        const t = timeSel.value;
-        const locName = locSel.value;
-
-        if (!(d && t && locName)) return;
-
-        // name → id using LOCATIONS
-        const locId = Object.keys(LOCATIONS).find(
-            (id) => LOCATIONS[id] === locName
-        );
-
-        if (!locId) {
-            console.warn("Could not find location_id for name:", locName);
+    // Filter times by date
+    function filterTimesByDate(dateStr) {
+        if (!dateStr) {
+            rebuildSelect(timeSel, []);
+            rebuildSelect(locSel, []);
             return;
         }
 
-        // ✅ send location_id, not location name
-        window.location.href =
-            `movieDetail.php?id=${MOVIE_ID}` +
-            `&date=${encodeURIComponent(d)}` +
-            `&time=${encodeURIComponent(t)}` +
-            `&location_id=${encodeURIComponent(locId)}`;
+        const seen = new Set();
+        const matches = originalTimeOptions
+            .slice(1)
+            .filter((opt) => opt.dataset?.date === dateStr)
+            .filter((opt) => {
+                const key = normalizeTime(opt.value);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            })
+            .map((opt) => {
+                const c = opt.cloneNode(true);
+                c.value = normalizeTime(c.value);
+                c.textContent = normalizeTime(c.textContent);
+                return c;
+            });
+
+        rebuildSelect(timeSel, matches);
+        rebuildSelect(locSel, []);
     }
 
-    // 4. initial population (page load)
-    populateDates(INIT_DATE);
-    populateTimes(INIT_DATE, INIT_TIME);
-    populateLocations(INIT_DATE, INIT_TIME, INIT_LOC);
-
-    // if PHP told us which location_id was chosen, we can force-select it in UI
-    if (INIT_LOC_ID && !INIT_LOC) {
-        const nameFromId = LOCATIONS[INIT_LOC_ID];
-        if (nameFromId) {
-            // only set if options already built
-            const opt = [...locSel.options].find((o) => o.value === nameFromId);
-            if (opt) opt.selected = true;
+    // Filter locations by date + time
+    function filterLocationsByDateTime(dateStr, timeStr) {
+        if (!dateStr || !timeStr) {
+            rebuildSelect(locSel, []);
+            return;
         }
+
+        const allowedLocIds = new Set(
+            originalTimeOptions
+                .slice(1)
+                .filter(
+                    (opt) =>
+                        opt.dataset?.date === dateStr &&
+                        normalizeTime(opt.value) === normalizeTime(timeStr)
+                )
+                .map((opt) => String(opt.dataset.loc))
+        );
+
+        const locMatches = originalLocOptions
+            .slice(1)
+            .filter((opt) => allowedLocIds.has(String(opt.value)))
+            .map((opt) => opt.cloneNode(true));
+
+        rebuildSelect(locSel, locMatches);
     }
 
-    // 5. event listeners
-    dateSel.addEventListener("change", () => {
+    // Redirect when all three values are selected
+    function redirectIfComplete() {
         const d = dateSel.value;
-        populateTimes(d);
-        // reset locations
-        locSel.innerHTML = '<option value="">-- Select --</option>';
+        const t = normalizeTime(timeSel.value);
+        const loc = locSel.value;
+
+        if (!d || !t || !loc || !MOVIE_ID) return;
+
+        const url =
+            "movieDetail.php?id=" +
+            encodeURIComponent(MOVIE_ID) +
+            "&date=" +
+            encodeURIComponent(d) +
+            "&time=" +
+            encodeURIComponent(t) +
+            "&location_id=" +
+            encodeURIComponent(loc);
+
+        window.location.href = url;
+    }
+
+    // Event listeners
+    dateSel.addEventListener("change", () => {
+        filterTimesByDate(dateSel.value);
         redirectIfComplete();
     });
 
     timeSel.addEventListener("change", () => {
-        const d = dateSel.value;
-        const t = timeSel.value;
-        populateLocations(d, t);
+        filterLocationsByDateTime(dateSel.value, timeSel.value);
         redirectIfComplete();
     });
 
-    locSel.addEventListener("change", () => {
-        redirectIfComplete();
-    });
+    locSel.addEventListener("change", redirectIfComplete);
+
+    // --- Initialize selects ---
+    if (INIT_DATE) {
+        const dateOpt = [...dateSel.options].find((o) => o.value === INIT_DATE);
+        if (!dateOpt) {
+            const uniqueDates = Array.from(
+                new Set(
+                    originalTimeOptions
+                        .slice(1)
+                        .map((o) => o.dataset?.date)
+                        .filter(Boolean)
+                )
+            );
+            const dateClones = uniqueDates.map((d) => new Option(d, d));
+            rebuildSelect(dateSel, dateClones);
+        }
+        dateSel.value = INIT_DATE;
+        filterTimesByDate(INIT_DATE);
+    } else {
+        rebuildSelect(timeSel, []);
+        rebuildSelect(locSel, []);
+    }
+
+    if (INIT_TIME) {
+        const t = normalizeTime(INIT_TIME);
+        const tOpt = [...timeSel.options].find(
+            (o) => normalizeTime(o.value) === t
+        );
+        if (tOpt) timeSel.value = t;
+        filterLocationsByDateTime(dateSel.value, t);
+    }
+
+    if (INIT_LOCID) {
+        const locOpt = [...locSel.options].find(
+            (o) => String(o.value) === String(INIT_LOCID)
+        );
+        if (locOpt) locSel.value = String(INIT_LOCID);
+    }
+
+    // Booking confirmation button
+    const confirmBtn = document.getElementById("confirmBooking");
+    if (confirmBtn) {
+        confirmBtn.addEventListener("click", () => {
+            const sessionHidden = document.getElementById("sessionId");
+            const sessionId = sessionHidden ? sessionHidden.value : "";
+
+            if (!sessionId) {
+                alert(
+                    " Session not found. Please reselect date/time/location."
+                );
+                return;
+            }
+        });
+    }
 });

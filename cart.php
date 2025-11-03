@@ -31,7 +31,6 @@ if (!$user) {
   exit;
 }
 
-// Fetch all pending bookings
 $stmt = $pdo->prepare("
     SELECT b.id, b.movie_id, b.screening_date, b.screening_time, b.seats, b.total_price, m.title
     FROM bookings b

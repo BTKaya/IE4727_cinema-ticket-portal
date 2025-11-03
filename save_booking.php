@@ -2,9 +2,6 @@
 require 'db.php';
 session_start();
 
-/**
- * 1. Read from normal POST (no JSON body)
- */
 $movie_id = $_POST['movie_id'] ?? null;
 $session_id = $_POST['session_id'] ?? null;
 $seats = $_POST['seats'] ?? [];   // seats[] from the form
@@ -33,9 +30,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = (int) $_SESSION['user_id'];
 
-/**
- * 3. Get the session from DB to verify it and to get canonical date/time/location
- */
 $sessionStmt = $pdo->prepare("
     SELECT s.id,
            s.movie_id AS session_movie_id,

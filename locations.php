@@ -35,7 +35,6 @@ $locations = $pdo->query("SELECT * FROM locations")->fetchAll(PDO::FETCH_ASSOC);
               <?php if (!empty($loc['image'])): ?>
                 <img src="<?= htmlspecialchars($loc['image']) ?>" alt="<?= htmlspecialchars($loc['name']) ?>">
               <?php else: ?>
-                <!-- placeholder -->
                 <span style="opacity:.6;">Location Picture</span>
               <?php endif; ?>
             </div>

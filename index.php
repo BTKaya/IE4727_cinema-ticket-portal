@@ -1,13 +1,10 @@
 <?php
 include 'db.php';
 $movies = $pdo->query("SELECT * FROM movies")->fetchAll(PDO::FETCH_ASSOC);
-
 $locations = $pdo->query("SELECT id, name FROM locations ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
-// Define which IDs you want to show
+// Movie IDs to display
 $allowedIds = [1, 2, 3];
-
-// Filter the movies array
 $filteredMovies = array_filter($movies, fn($m) => in_array($m['id'], $allowedIds));
 
 $sql = "
@@ -27,12 +24,13 @@ $sql = "
 $stmt = $pdo->query($sql);
 $sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// build unique movies
 $movieMap = [];
-foreach ($sessions as $row) {
-  $movieMap[$row['movie_id']] = $row['movie_title'];
-}
+$sessionMap = []; // movie_id => [ [session_id, location_name, session_date, session_time], ... ]
 
+foreach ($sessions as $s) {
+  $movieMap[$s['movie_id']] = $s['movie_title'];
+  $sessionMap[$s['movie_id']][] = $s;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,33 +39,28 @@ foreach ($sessions as $row) {
   <meta charset="UTF-8">
   <title>Lumina Cinema - Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Correct flat paths -->
   <link rel="stylesheet" href="style.css">
   <script src="app.js" defer></script>
   <link rel="icon" type="image/png" href="assets/images/luminaIcon.png">
+
+  <!-- Inline style to hide scrollbar -->
   <style>
     html,
     body {
       height: 100%;
       overflow-y: scroll;
-      /* allow scrolling */
       scrollbar-width: none;
-      /* Firefox */
       -ms-overflow-style: none;
-      /* IE/Edge */
     }
 
     html::-webkit-scrollbar,
     body::-webkit-scrollbar {
       display: none;
-      /* Chrome, Safari, Opera */
     }
   </style>
 </head>
 
 <body>
-
   <?php include 'header.php'; ?>
   <?php include 'menu.php'; ?>
 
@@ -97,29 +90,46 @@ foreach ($sessions as $row) {
 
     <aside class="quickbuy-list">
       <ul id="quickbuy">
-        <li>
-          <a href="#" id="quickBuyToggle" class="quickbuy-text">Quick Buy</a>
-        </li>
+        <li><a href="#" id="quickBuyToggle" class="quickbuy-text">Quick Buy</a></li>
       </ul>
 
       <div class="quickbuy-container" id="quickBuyContainer">
-        <form id="quickBuyForm" action="#" method="GET">
+        <form id="quickBuyForm" action="movieDetail.php" method="GET">
           <label for="movie">Movie:</label>
-          <select id="movie" name="movie_id" class="opened-list-styling" required>
+          <select id="movie" name="id" class="opened-list-styling" required>
             <option value="">Select a movie</option>
             <?php foreach ($movieMap as $mid => $mtitle): ?>
-              <option value="<?= htmlspecialchars($mid) ?>"><?= htmlspecialchars($mtitle) ?></option>
+              <option value="<?= (int) $mid ?>"><?= htmlspecialchars($mtitle) ?></option>
             <?php endforeach; ?>
           </select>
 
           <label for="location">Location:</label>
           <select id="location" name="location_id" class="opened-list-styling" required disabled>
             <option value="">Select a cinema</option>
+            <?php
+            // Ensure unique movie-location pairs
+            $seen = [];
+            foreach ($sessions as $s):
+              $key = $s['movie_id'] . '-' . $s['location_id'];
+              if (isset($seen[$key]))
+                continue;
+              $seen[$key] = true;
+              ?>
+              <option value="<?= (int) $s['location_id'] ?>" data-movie-id="<?= (int) $s['movie_id'] ?>">
+                <?= htmlspecialchars($s['location_name']) ?>
+              </option>
+            <?php endforeach; ?>
           </select>
 
           <label for="showtime">Showtime:</label>
           <select id="showtime" name="session_id" class="opened-list-styling" required disabled>
             <option value="">Select a showtime</option>
+            <?php foreach ($sessions as $s): ?>
+              <option value="<?= (int) $s['session_id'] ?>" data-movie-id="<?= (int) $s['movie_id'] ?>"
+                data-location-id="<?= (int) $s['location_id'] ?>">
+                <?= htmlspecialchars($s['session_date']) ?> @ <?= htmlspecialchars($s['session_time']) ?>
+              </option>
+            <?php endforeach; ?>
           </select>
 
           <button type="submit" class="buy-btn">Buy</button>
@@ -127,6 +137,8 @@ foreach ($sessions as $row) {
       </div>
     </aside>
   </main>
+
+  <script src="quickbuy.js" defer></script>
 
   <section class="movies-grid">
     <?php foreach ($movies as $m): ?>
@@ -137,9 +149,7 @@ foreach ($sessions as $row) {
     <?php endforeach; ?>
   </section>
 
-  <script>
-    const SESSIONS = <?= json_encode($sessions, JSON_UNESCAPED_UNICODE) ?>;
-  </script>
-  <script src="quickbuy.js" defer></script>
-
   <?php include 'footer.php'; ?>
+</body>
+
+</html>
