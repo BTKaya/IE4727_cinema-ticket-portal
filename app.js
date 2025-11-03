@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (offenders.length > 0) {
                 offenders.forEach((el) => el.classList.add("error"));
                 alert(
-                    "You cannot leave a single-seat gap. Please adjust highlighted seats."
+                    "You cannot leave a single-seat gap. Please adjust your seats."
                 );
                 return;
             }
