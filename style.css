@@ -592,6 +592,7 @@ option:hover {
     gap: 2rem;
     align-items: flex-start;
     margin-bottom: 2rem;
+    text-align: left;
 }
 
 .movie-info img {
@@ -599,9 +600,53 @@ option:hover {
     border-radius: 10px;
 }
 
+.movie-info-table th {
+    vertical-align: top;
+    white-space: nowrap;
+    padding: 0.5rem 1rem 0.5rem 0;
+}
+
+.movie-info-table td {
+    vertical-align: top;
+    text-align: justify;
+    padding: 0.5rem 0;
+}
+
 .movie-info p {
     flex: 1;
     line-height: 1.5;
+}
+
+/* trailer link in movie details */
+.movie-info-table a.trailer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #fff;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    transition: background 0.25s ease, border 0.25s ease, transform 0.25s ease;
+}
+
+.movie-info-table a.trailer-link::before {
+    content: "▶";
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+.movie-info-table a.trailer-link:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-1px);
+}
+
+.movie-info-table a.trailer-link:active {
+    transform: translateY(0);
 }
 
 /* ===== CART PAGE ===== */
