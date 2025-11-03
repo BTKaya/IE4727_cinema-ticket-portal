@@ -33,7 +33,7 @@ $layoutAttr = isset($layout) ? "data-layout='$layout'" : "";
       </svg>
     </button>
 
-    <!-- overlay + dropdown search -->
+    <!-- searchbar -->
     <div id="searchOverlay" class="search-overlay"></div>
     <div id="searchBar" class="searchbar" role="search">
       <input type="text" id="searchInput" placeholder="Search movies..." autocomplete="off">

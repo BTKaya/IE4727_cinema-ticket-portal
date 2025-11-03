@@ -2,7 +2,7 @@
 $host = "localhost";
 $dbname = "cinema_portal";
 $user = "root";
-$pass = ""; // set to your MySQL password if needed
+$pass = "";
 
 try {
   $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);

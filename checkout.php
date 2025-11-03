@@ -14,4 +14,5 @@ foreach ($booking_ids as $bid) {
     $stmt->execute([$bid]);
 }
 
-echo "<script>alert('✅ Checkout successful! Your seats are now permanently booked.'); window.location='index.php';</script>";
+// redirect to homepage with success message
+echo "<script>alert('Checkout successful! Your seats are now permanently booked.'); window.location='index.php';</script>";

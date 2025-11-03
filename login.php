@@ -4,13 +4,13 @@ require __DIR__ . '/db.php';
 
 $errors = [];
 
-// capture redirect target (if user was sent here from auth.php)
+// capture redirect target from auth.php
 $redirect = $_GET['redirect'] ?? 'index.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $username = trim($_POST['username'] ?? '');
   $password = $_POST['password'] ?? '';
-  // also keep redirect if posted
+  // preserve redirect target through POST
   $redirect = $_POST['redirect'] ?? $redirect;
 
   if ($username === '' || $password === '') {
