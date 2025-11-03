@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 31, 2025 at 05:37 PM
+-- Generation Time: Nov 03, 2025 at 05:10 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -47,7 +47,8 @@ CREATE TABLE `bookings` (
 --
 
 INSERT INTO `bookings` (`id`, `user_id`, `movie_id`, `session_id`, `location_id`, `screening_date`, `screening_time`, `seats`, `price_per_seat`, `total_price`, `status`, `created_at`) VALUES
-(51, 2, 2, 110, 2, '2025-11-04', '12:00:00', '[\"H7\",\"H8\"]', 10.00, 20.00, 'pending', '2025-10-31 16:37:10');
+(51, 2, 2, 110, 2, '2025-11-04', '12:00:00', '[\"H7\",\"H8\"]', 10.00, 20.00, 'checked_out', '2025-10-31 16:37:10'),
+(52, 2, 1, 50, 2, '2025-11-07', '12:00:00', '[\"A1\",\"A2\"]', 10.00, 20.00, 'checked_out', '2025-11-03 01:32:07');
 
 -- --------------------------------------------------------
 
@@ -83,6 +84,10 @@ CREATE TABLE `movies` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `summary` text DEFAULT NULL,
+  `director` varchar(255) DEFAULT NULL,
+  `actors` text DEFAULT NULL,
+  `release_date` date DEFAULT NULL,
+  `trailer_url` varchar(255) DEFAULT NULL,
   `poster` varchar(255) DEFAULT NULL,
   `location_type` tinyint(4) NOT NULL DEFAULT 1,
   `duration` int(11) DEFAULT NULL,
@@ -93,19 +98,19 @@ CREATE TABLE `movies` (
 -- Dumping data for table `movies`
 --
 
-INSERT INTO `movies` (`id`, `title`, `summary`, `poster`, `location_type`, `duration`, `created_at`) VALUES
-(1, 'Chainsaw Man - The Movie: Reze Arc', 'In a brutal war between devils, hunters, and secret enemies, a mysterious girl named Reze has stepped into Denji\'s world, and he faces his deadliest battle yet, fueled by love in a world where survival knows no rules.', 'assets/images/slide1.webp', 1, NULL, '2025-10-27 10:01:18'),
-(2, 'Black Phone 2', 'Four years after escaping The Grabber, Finney Blake is struggling with his life after captivity. When his sister Gwen begins receiving calls in her dreams from the black phone and seeing disturbing visions of three boys being stalked at a winter camp, the siblings become determined to solve the mystery and confront a killer who has grown more powerful in death and more significant to them than either could imagine.', 'assets/images/slide2.webp', 2, NULL, '2025-10-27 10:01:18'),
-(3, 'Superman', 'Superman, a journalist in Metropolis, embarks on a journey to reconcile his Kryptonian heritage with his human upbringing as Clark Kent.', 'assets/images/slide3.webp', 1, NULL, '2025-10-27 10:01:18'),
-(4, 'Mission: Impossible - The Final Reckoning', 'Ethan Hunt and team continue their search for the terrifying AI known as the Entity — which has infiltrated intelligence networks all over the globe — with the world\'s governments and a mysterious ghost from Hunt\'s past on their trail. Joined by new allies and armed with the means to shut the Entity down for good, Hunt is in a race against time to prevent the world as we know it from changing forever.', 'assets/images/slide4.webp', 2, NULL, '2025-10-31 07:08:18'),
-(5, 'Frankenstein', 'Dr. Victor Frankenstein, a brilliant but egotistical scientist, brings a creature to life in a monstrous experiment that ultimately leads to the undoing of both the creator and his tragic creation.', 'assets/images/slide5.jpg', 1, NULL, '2025-10-31 07:14:10'),
-(6, 'The Bad Guys 2', 'The now-reformed Bad Guys are trying (very, very hard) to be good, but instead find themselves hijacked into a high-stakes, globe-trotting heist, masterminded by a new team of criminals they never saw coming: The Bad Girls.', 'assets/images/slide6.jpg', 1, NULL, '2025-10-31 07:20:23'),
-(7, 'Bugonia', 'Two conspiracy obsessed young men kidnap the high-powered CEO of a major company, convinced that she is an alien intent on destroying planet Earth.', 'assets/images/slide7.jpg', 2, NULL, '2025-10-31 07:22:52'),
-(8, 'Sinners', 'Trying to leave their troubled lives behind, twin brothers return to their hometown to start again, only to discover that an even greater evil is waiting to welcome them back.', 'assets/images/slide8.webp', 2, NULL, '2025-10-31 07:37:12'),
-(9, 'Wicked', 'In the land of Oz, ostracized and misunderstood green-skinned Elphaba is forced to share a room with the popular aristocrat Glinda at Shiz University, and the two\'s unlikely friendship is tested as they begin to fulfill their respective destinies as Glinda the Good and the Wicked Witch of the West.', 'assets/images/slide9.webp', 1, NULL, '2025-10-31 07:39:06'),
-(10, 'Thunderbolts*', 'After finding themselves ensnared in a death trap, seven disillusioned castoffs must embark on a dangerous mission that will force them to confront the darkest corners of their pasts.', 'assets/images/slide10.webp', 2, NULL, '2025-10-31 07:40:27'),
-(11, 'Bring Her Back', 'Following the death of their father, a brother and sister are sent to live with a foster mother, only to learn that she is hiding a terrifying secret.', 'assets/images/slide11.webp', 1, NULL, '2025-10-31 07:42:08'),
-(12, 'KPop Demon Hunters', 'When K-pop superstars Rumi, Mira and Zoey aren\'t selling out stadiums, they\'re using their secret powers to protect their fans from supernatural threats.', 'assets/images/slide12.webp', 2, NULL, '2025-10-31 07:46:01');
+INSERT INTO `movies` (`id`, `title`, `summary`, `director`, `actors`, `release_date`, `trailer_url`, `poster`, `location_type`, `duration`, `created_at`) VALUES
+(1, 'Chainsaw Man - The Movie: Reze Arc', 'In a brutal war between devils, hunters, and secret enemies, a mysterious girl named Reze has stepped into Denji\'s world, and he faces his deadliest battle yet, fueled by love in a world where survival knows no rules.', 'Tatsuya Yoshihara', 'Kikunosuke Toya; Tomori Kusunoki; Fairouz Ai', '2025-09-19', 'https://www.youtube.com/watch?v=tAzAhDNdehs', 'assets/images/slide1.webp', 2, NULL, '2025-10-27 10:01:18'),
+(2, 'Black Phone 2', 'Four years after escaping The Grabber, Finney Blake is struggling with his life after captivity. When his sister Gwen begins receiving calls in her dreams from the black phone and seeing disturbing visions of three boys being stalked at a winter camp, the siblings become determined to solve the mystery and confront a killer who has grown more powerful in death and more significant to them than either could imagine.', 'Scott Derrickson', 'Mason Thames; Ethan Hawke; Madeleine McGraw', '2025-10-17', 'https://www.youtube.com/watch?v=v0kqkRZHqk4', 'assets/images/slide2.webp', 2, NULL, '2025-10-27 10:01:18'),
+(3, 'Superman', 'Superman, a journalist in Metropolis, embarks on a journey to reconcile his Kryptonian heritage with his human upbringing as Clark Kent.', 'James Gunn', 'David Corenswet; Rachel Brosnahan; Nicholas Hoult', '2025-07-11', 'https://www.youtube.com/watch?v=Ox8ZLF6cGM0', 'assets/images/slide3.webp', 2, NULL, '2025-10-27 10:01:18'),
+(4, 'Mission: Impossible - The Final Reckoning', 'Ethan Hunt and team continue their search for the terrifying AI known as the Entity — which has infiltrated intelligence networks all over the globe — with the world\'s governments and a mysterious ghost from Hunt\'s past on their trail. Joined by new allies and armed with the means to shut the Entity down for good, Hunt is in a race against time to prevent the world as we know it from changing forever.', 'Christopher McQuarrie', 'Tom Cruise; Hayley Atwell; Ving Rhames', '2025-05-23', 'https://www.youtube.com/watch?v=fsQgc9pCyDU', 'assets/images/slide4.webp', 2, NULL, '2025-10-31 07:08:18'),
+(5, 'Frankenstein', 'Dr. Victor Frankenstein, a brilliant but egotistical scientist, brings a creature to life in a monstrous experiment that ultimately leads to the undoing of both the creator and his tragic creation.', 'Guillermo del Toro', 'Oscar Isaac; Jacob Elordi; Mia Goth', '2025-10-17', 'https://www.youtube.com/watch?v=8aulMPhE12g', 'assets/images/slide5.jpg', 2, NULL, '2025-10-31 07:14:10'),
+(6, 'The Bad Guys 2', 'The now-reformed Bad Guys are trying (very, very hard) to be good, but instead find themselves hijacked into a high-stakes, globe-trotting heist, masterminded by a new team of criminals they never saw coming: The Bad Girls.', 'Pierre Perifel', 'Sam Rockwell; Marc Maron; Awkwafina', '2025-08-01', 'https://www.youtube.com/watch?v=HvLHYox_Vq8', 'assets/images/slide6.jpg', 2, NULL, '2025-10-31 07:20:23'),
+(7, 'Bugonia', 'Two conspiracy obsessed young men kidnap the high-powered CEO of a major company, convinced that she is an alien intent on destroying planet Earth.', 'Yorgos Lanthimos', 'Emma Stone; Jesse Plemons; Alicia Silverstone', '2025-10-24', 'https://www.youtube.com/watch?v=bd_5HcTujfc', 'assets/images/slide7.jpg', 2, NULL, '2025-10-31 07:22:52'),
+(8, 'Sinners', 'Trying to leave their troubled lives behind, twin brothers return to their hometown to start again, only to discover that an even greater evil is waiting to welcome them back.', 'Ryan Coogler', 'Michael B. Jordan; Hailee Steinfeld; Delroy Lindo', '2025-04-18', 'https://www.youtube.com/watch?v=bKGxHflevuk', 'assets/images/slide8.webp', 2, NULL, '2025-10-31 07:37:12'),
+(9, 'Wicked', 'In the land of Oz, ostracized and misunderstood green-skinned Elphaba is forced to share a room with the popular aristocrat Glinda at Shiz University, and the two\'s unlikely friendship is tested as they begin to fulfill their respective destinies as Glinda the Good and the Wicked Witch of the West.', 'Jon M. Chu', 'Cynthia Erivo; Ariana Grande; Michelle Yeoh', '2024-11-22', 'https://www.youtube.com/watch?v=76i-xMPaVE8', 'assets/images/slide9.webp', 2, NULL, '2025-10-31 07:39:06'),
+(10, 'Thunderbolts*', 'After finding themselves ensnared in a death trap, seven disillusioned castoffs must embark on a dangerous mission that will force them to confront the darkest corners of their pasts.', 'Jake Schreier', 'Florence Pugh; Sebastian Stan; David Harbour', '2025-05-02', 'https://www.youtube.com/watch?v=-sAOWhvheK8', 'assets/images/slide10.webp', 2, NULL, '2025-10-31 07:40:27'),
+(11, 'Bring Her Back', 'Following the death of their father, a brother and sister are sent to live with a foster mother, only to learn that she is hiding a terrifying secret.', 'Danny & Michael Philippou', 'Billy Barratt; Sora Wong; Sally Hawkins', '2025-05-29', 'https://www.youtube.com/watch?v=kBskrYZfhw8', 'assets/images/slide11.webp', 2, NULL, '2025-10-31 07:42:08'),
+(12, 'KPop Demon Hunters', 'When K-pop superstars Rumi, Mira and Zoey aren\'t selling out stadiums, they\'re using their secret powers to protect their fans from supernatural threats.', 'Maggie Kang & Chris Appelhans', 'Arden Cho; Ahn Hyo-seop; Daniel Dae Kim', '2025-06-20', 'https://www.youtube.com/watch?v=AzCAwdp1uIQ', 'assets/images/slide12.webp', 2, NULL, '2025-10-31 07:46:01');
 
 -- --------------------------------------------------------
 
@@ -2926,7 +2931,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `locations`

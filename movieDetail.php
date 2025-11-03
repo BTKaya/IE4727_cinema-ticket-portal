@@ -117,8 +117,38 @@ $rows = range('A', 'H');
   <h1><?= htmlspecialchars($movie['title']); ?></h1>
 
   <div class="movie-info">
-    <img src="<?= htmlspecialchars($movie['poster']); ?>" alt="Poster">
-    <p><?= nl2br(htmlspecialchars($movie['summary'])); ?></p>
+    <img src="<?= htmlspecialchars($movie['poster']); ?>" alt="Poster" style="margin-top: 0.75rem;">
+    <table class="movie-info-table">
+      <tr>
+        <th>Title:</th>
+        <td><?= htmlspecialchars($movie['title']); ?></td>
+      </tr>
+      <tr>
+        <th>Summary:</th>
+        <td><?= nl2br(htmlspecialchars($movie['summary'])); ?></td>
+      </tr>
+      <tr>
+        <th>Director:</th>
+        <td><?= htmlspecialchars($movie['director']); ?></td>
+      </tr>
+      <tr>
+        <th>Actors:</th>
+        <td><?= htmlspecialchars($movie['actors']); ?></td>
+      </tr>
+      <tr>
+        <th>Release Date:</th>
+        <td><?= htmlspecialchars($movie['release_date']); ?></td>
+      </tr>
+      <tr>
+        <th>Trailer:</th>
+        <td>
+          <a href="<?= htmlspecialchars($movie['trailer_url']); ?>" target="_blank" class="trailer-link">
+            Watch on YouTube
+          </a>
+        </td>
+      </tr>
+    </table>
+
   </div>
 
   <hr>
