@@ -78,27 +78,26 @@ if (!$session_id && $movie_id && $date && $time && $location_id) {
   $session_id = (int) ($sessStmt2->fetchColumn() ?: 0);
 }
 
-// Fetch booked seats
-$bookedSeats = [];
-if ($date && $time && $location_id) {
-  $seatQuery = $pdo->prepare("
-    SELECT seats
-    FROM bookings
-    WHERE movie_id = ?
-      AND screening_date = ?
-      AND screening_time = ?
-      AND location_id = ?
-      AND status IN ('pending','confirmed')
-  ");
-  $seatQuery->execute([$movie_id, $date, $time, $location_id]);
-  $rows = $seatQuery->fetchAll(PDO::FETCH_ASSOC);
-
-  foreach ($rows as $r) {
-    $taken = json_decode($r['seats'], true);
-    if (is_array($taken))
-      $bookedSeats = array_merge($bookedSeats, $taken);
-  }
+/* ======== Fetch booked seats from sessions.booked_seats (CSV; no JSON) ======== */
+function parseSeatList(string $s): array
+{
+  if ($s === '')
+    return [];
+  // no spaces expected; split and normalize
+  $arr = array_map('trim', explode(',', $s));
+  // de-dup + remove empties
+  $arr = array_values(array_unique(array_filter($arr, fn($x) => $x !== '')));
+  return $arr;
 }
+
+$bookedSeats = [];
+if ($session_id > 0) {
+  $q = $pdo->prepare("SELECT booked_seats FROM sessions WHERE id = ? LIMIT 1");
+  $q->execute([$session_id]);
+  $csv = (string) ($q->fetchColumn() ?: '');
+  $bookedSeats = parseSeatList($csv);
+}
+/* ============================================================================ */
 
 $rows = range('A', 'H');
 ?>
