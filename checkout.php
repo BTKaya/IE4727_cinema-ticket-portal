@@ -32,7 +32,7 @@ $ticketFiles = [];
 
 foreach ($booking_ids as $bid) {
     $stmt = $pdo->prepare("
-        SELECT b.*, m.title, l.name AS location_name, s.id AS session_id
+        SELECT b.*, m.title, l.name AS location_name, s.id AS session_id, s.hall
         FROM bookings b
         JOIN movies m ON b.movie_id = m.id
         JOIN locations l ON b.location_id = l.id
@@ -65,7 +65,12 @@ foreach ($booking_ids as $bid) {
     $seats = trim($b['seats'], '[]"');
     $seats = str_replace('","', ', ', $seats);
     $seatArray = explode(', ', $seats);
-    $seatsWrapped = array_map(fn($c) => implode(", ", $c), array_chunk($seatArray, 5));
+    $seatArray = array_map('trim', explode(',', $seats));
+    $seatsWrapped = array_map(
+        fn($chunk) => implode(", ", $chunk),
+        array_chunk($seatArray, 4)
+    );
+
 
     try {
         $pdo->beginTransaction();
@@ -86,6 +91,7 @@ foreach ($booking_ids as $bid) {
     $bookingData[] = [
         'title' => $b['title'],
         'location_name' => $b['location_name'],
+        'hall' => $b['hall'],
         'seats' => $seats,
         'screening_date' => $b['screening_date'],
         'screening_time' => substr($b['screening_time'], 0, 5),
@@ -114,17 +120,20 @@ foreach ($booking_ids as $bid) {
     $pdf->SetXY(0, 58);
     $pdf->Cell(210, 8, $b['location_name'], 0, 1, "C");
     $pdf->SetFont("Arial", "", 12);
-    $xSeats = 35;
-    $xDate = 95;
-    $xTime = 155;
+    $xSeats = 25;
+    $xHall = 85;
+    $xDate = 125;
+    $xTime = 165;
     $yStart = 70;
     $lineH = 6;
     $pdf->SetXY($xSeats, $yStart);
     $pdf->Cell(40, $lineH, "Seats:", 0, 0, "L");
+    $pdf->SetXY($xHall, $yStart);
+    $pdf->Cell(25, $lineH, "Hall:", 0, 0, "L");
     $pdf->SetXY($xDate, $yStart);
-    $pdf->Cell(40, $lineH, "Date:", 0, 0, "L");
+    $pdf->Cell(30, $lineH, "Date:", 0, 0, "L");
     $pdf->SetXY($xTime, $yStart);
-    $pdf->Cell(40, $lineH, "Time:", 0, 1, "L");
+    $pdf->Cell(30, $lineH, "Time:", 0, 1, "L");
     $valuesY = $yStart + 7;
     $pdf->SetFont("Arial", "B", 12);
     $yPos = $valuesY;
@@ -133,6 +142,8 @@ foreach ($booking_ids as $bid) {
         $pdf->Cell(60, $lineH, $line, 0, 1, "L");
         $yPos += $lineH;
     }
+    $pdf->SetXY($xHall, $valuesY);
+    $pdf->Cell(30, $lineH, $b['hall'], 0, 1, "L");
     $pdf->SetXY($xDate, $valuesY);
     $pdf->Cell(40, $lineH, $b['screening_date'], 0, 1, "L");
     $pdf->SetXY($xTime, $valuesY);
@@ -141,7 +152,7 @@ foreach ($booking_ids as $bid) {
     $pdf->SetFont("Arial", "B", 12);
     $paidY = $blockBottomY + 6;
     $pdf->SetXY($xTime, $paidY);
-    $pdf->Cell(50, 8, "Paid: $" . number_format($b['total_price'], 2), 0, 1, "R");
+    $pdf->Cell(50, 8, "Paid: $" . number_format($b['total_price'], 2), 0, 1, "L");
     $pdf->Ln(3);
     $ticketFile = $pdfDir . "ticket_" . $b['id'] . ".pdf";
     $pdf->Output("F", $ticketFile);

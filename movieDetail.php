@@ -17,6 +17,12 @@ $sessionsStmt = $pdo->prepare("
     SELECT id, session_date, session_time, location_id
     FROM sessions
     WHERE movie_id = ?
+      AND session_date >= CURDATE()
+      AND session_date <= DATE_ADD(CURDATE(), INTERVAL 4 DAY)
+      AND (
+           session_date > CURDATE()
+           OR (session_date = CURDATE() AND session_time > CURTIME())
+      )
     ORDER BY session_date, session_time
 ");
 $sessionsStmt->execute([$movie_id]);
