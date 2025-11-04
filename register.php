@@ -10,18 +10,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $password = $_POST['password'] ?? '';
   $password2 = $_POST['password2'] ?? '';
 
-  // basic validation
   if ($username === '') {
     $errors[] = 'Username required';
   }
   if ($password === '') {
     $errors[] = 'Password required';
   }
+  if ($email === '') {
+    $errors[] = 'Email required';
+  }
   if ($password !== $password2) {
     $errors[] = 'Passwords do not match';
   }
 
-  // check if username taken
   if (!$errors) {
     $stmt = $pdo->prepare('SELECT id FROM users WHERE username = ? LIMIT 1');
     $stmt->execute([$username]);
@@ -29,6 +30,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $errors[] = 'Username already taken';
     }
   }
+
+  if (!$errors) {
+    $stmt = $pdo->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
+    $stmt->execute([$email]);
+    if ($stmt->fetch()) {
+      $errors[] = 'Email already registered';
+    }
+  }
+
 
   if (!$errors) {
     $hash = password_hash($password, PASSWORD_DEFAULT);
@@ -75,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" name="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
       </label>
 
-      <label>Email (optional)
+      <label>Email
         <input type="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
       </label>
 
