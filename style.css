@@ -25,13 +25,13 @@ body {
 }
 
 option {
-    background: #111; /* dark background inside dropdown list */
+    background: #111;
     color: #fff;
 }
 
 option:checked,
 option:hover {
-    background: #ff4d4d; /* highlight color for selected/hovered option */
+    background: #ff4d4d;
     color: #fff;
 }
 
@@ -70,11 +70,10 @@ option:hover {
     top: 0;
     left: 0;
     right: 0;
-    height: 100%; /* extend below header so fade is visible */
+    height: 100%;
     background: transparent;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    /* make the blur disappear toward the bottom */
     -webkit-mask-image: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0.9) 0%,
@@ -91,12 +90,11 @@ option:hover {
     z-index: -2;
 }
 
-/* 2) tint layer (stays the same) */
 .templates-header::after {
     content: "";
     position: absolute;
     inset: 0;
-    height: 100%; /* match the blur height */
+    height: 100%;
     background: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0.75) 0%,
@@ -141,12 +139,12 @@ option:hover {
 .side-panel {
     position: fixed;
     top: 0;
-    left: 0; /* change to right:0 if you want from right */
+    left: 0;
     height: 100vh;
     width: min(80vw, 320px);
     background: var(--bg2, #111);
     color: var(--text, #fff);
-    transform: translateX(-100%); /* hidden off screen */
+    transform: translateX(-100%);
     transition: transform 0.25s ease;
     z-index: 99;
     display: flex;
@@ -173,14 +171,13 @@ option:hover {
 }
 
 .closeButton {
-    transition: transform 0.25s ease; /* smooth rotation */
+    transition: transform 0.25s ease;
 }
 
 .closeButton:hover {
     transform: scale(1.5) rotate(90deg);
 }
 
-/* nav links */
 .side-panel__body {
     display: flex;
     flex-direction: column;
@@ -200,7 +197,6 @@ option:hover {
     transform: translateX(20px);
 }
 
-/* open state (added by JS) */
 .side-panel.is-open {
     transform: translateX(0);
 }
@@ -209,7 +205,6 @@ option:hover {
     pointer-events: auto;
 }
 
-/* stop scroll when open (optional) */
 .body-locked {
     overflow: hidden;
 }
@@ -240,7 +235,6 @@ option:hover {
     transform: scale(1.35) rotate(-90deg);
 }
 
-/* overlay that darkens the page */
 .search-overlay {
     position: fixed;
     inset: 0;
@@ -256,15 +250,14 @@ option:hover {
     pointer-events: auto;
 }
 
-/* ===== floating search bar (drops under header) ===== */
+/* floating search bar */
 .searchbar {
     position: fixed;
     top: 0;
     left: 50%;
-    /* start hidden above the viewport */
     transform: translate(-50%, -120%) scale(0.98);
     width: min(700px, 85vw);
-    background: rgba(20, 20, 20, 0.95);
+    background: rgba(112, 112, 112, 0.35);
     border-radius: 200px;
     padding: 1.5rem 2rem;
     display: flex;
@@ -273,7 +266,7 @@ option:hover {
     opacity: 0;
     backdrop-filter: blur(12px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-    z-index: 120; /* above header (which is z-index: 50) */
+    z-index: 120;
     transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
@@ -347,7 +340,6 @@ option:hover {
     background-size: cover;
     background-position: center;
     opacity: 0;
-    /* animation: fadeSlideshow 18s infinite; */
     z-index: 1;
     object-fit: cover;
     object-position: center;
@@ -358,37 +350,7 @@ option:hover {
     opacity: 1;
 }
 
-/* Fade timing for 3 slides */
-/* .slideshow-image:nth-child(1) {
-    animation-delay: 0s;
-}
-.slideshow-image:nth-child(2) {
-    animation-delay: 6s;
-}
-.slideshow-image:nth-child(3) {
-    animation-delay: 12s;
-} */
-
-/* Smooth fade animation */
-/* @keyframes fadeSlideshow {
-    0% {
-        opacity: 0;
-    }
-    10% {
-        opacity: 1;
-    }
-    30% {
-        opacity: 1;
-    }
-    40% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 0;
-    }
-} */
-
-/* DARK FADE FOR READABILITY */
+/* DARK FADE */
 .hero-wrap::before {
     content: "";
     position: absolute;
@@ -405,7 +367,6 @@ option:hover {
     content: "";
     position: absolute;
     inset: 0;
-    /* circle at bottom right */
     background: radial-gradient(
         circle at bottom right,
         rgba(0, 0, 0, 0.85) 0%,
@@ -440,7 +401,6 @@ option:hover {
     transform-origin: left center;
 }
 
-/* Only the animated underline */
 .movie-name::after {
     content: "";
     position: absolute;
@@ -512,7 +472,7 @@ option:hover {
     width: 100%;
     border-radius: 10px;
     transition: transform 0.35s;
-    object-fit: cover; /* or 'contain' if you prefer letterboxing */
+    object-fit: cover;
     object-position: center;
 }
 
@@ -543,13 +503,12 @@ option:hover {
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
-    background: #000; /* ensures no slideshow gradient shows through */
+    background: #000;
     color: white;
     position: relative;
-    z-index: 10; /* always above slideshow visuals */
+    z-index: 10;
 }
 
-/* ensures nothing tries to align like the hero */
 .movie-page * {
     position: relative;
     z-index: 10;
@@ -620,7 +579,6 @@ option:hover {
     line-height: 1.5;
 }
 
-/* trailer link in movie details */
 .movie-info-table a.trailer-link {
     display: inline-flex;
     align-items: center;
@@ -695,7 +653,6 @@ option:hover {
     font-size: 1.1rem;
 }
 
-/* Remove Booking Button */
 .remove-btn {
     margin-top: 1rem;
     background: #b23434;
@@ -832,15 +789,13 @@ option:hover {
     color: white;
 }
 
-/* Legend seats should not react like real seats */
 .seat.static {
-    pointer-events: none; /* cannot click */
-    transform: none !important; /* no scaling */
+    pointer-events: none;
+    transform: none !important;
     box-shadow: none !important;
     opacity: 1 !important;
 }
 
-/* Prevent hover effects on legend seats */
 .seat.static:hover {
     transform: none !important;
 }
@@ -873,14 +828,12 @@ option:hover {
     background: linear-gradient(to right, transparent, #666, transparent);
 }
 
-/* ===== Center Confirm Button Under Seat Map ===== */
 .confirm-wrap {
     display: flex;
     justify-content: center;
     margin-top: 2rem;
 }
 
-/* ===== Confirm Button Styling (Dark Cinematic Theme) ===== */
 .confirm-btn {
     background: #ffffff15;
     border: 2px solid #ffffff44;
@@ -906,7 +859,6 @@ option:hover {
     background: #ffffff35;
 }
 
-/* ===== Date + Time Selection Styling ===== */
 .dateTimeLocation-select {
     display: flex;
     justify-content: center;
@@ -1067,7 +1019,7 @@ option:hover {
     font-size: clamp(2rem, 3vw, 2.6rem);
     margin-bottom: 2.2rem;
     font-weight: 700;
-    text-align: left; /* matches storyboard left alignment */
+    text-align: left;
 }
 
 .locations-list {
@@ -1264,11 +1216,11 @@ option:hover {
 
 /* ================= Account ================= */
 .account-wrapper {
-    margin-top: calc(var(--header-h) + 30px); /* was +60px */
+    margin-top: calc(var(--header-h) + 30px);
     padding: 2rem 1rem;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* top alignment instead of full center */
+    align-items: flex-start;
     min-height: calc(100vh - var(--header-h) - 170px);
 }
 
@@ -1444,7 +1396,7 @@ option:hover {
 /* ================= Quick Buy ================= */
 .quickbuy-list {
     position: absolute;
-    bottom: 8%; /* was top: 40% */
+    bottom: 8%;
     right: 3.5%;
     z-index: 110;
 }
@@ -1608,7 +1560,7 @@ button.buy-btn {
 
 .buy-btn:hover {
     transform: scale(1.2);
-    color: #fff; /* keep same color, but allows transition effect */
+    color: #fff;
 }
 
 .buy-btn:hover::after {
@@ -1623,7 +1575,6 @@ button.buy-btn {
     width: 0;
 }
 
-/* wrapper */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -1631,7 +1582,6 @@ button.buy-btn {
     font-family: inherit;
 }
 
-/* trigger looks like your inputs */
 .dropdown-trigger {
     width: 100%;
     background: rgba(20, 20, 20, 0.8);
@@ -1645,7 +1595,6 @@ button.buy-btn {
     backdrop-filter: blur(3px);
 }
 
-/* arrow on trigger */
 .dropdown-trigger::after {
     content: "";
     position: absolute;
@@ -1660,13 +1609,12 @@ button.buy-btn {
     transition: transform 0.25s ease;
 }
 
-/* the actual dropdown list */
 .dropdown-menu {
     position: absolute;
-    bottom: calc(100% + 0.45rem); /* appears above */
+    bottom: calc(100% + 0.45rem);
     left: 0;
     width: 100%;
-    background: rgba(8, 8, 8, 0.2); /* adjust opacity here */
+    background: rgba(8, 8, 8, 0.2);
     backdrop-filter: blur(3px);
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.03);
@@ -1674,13 +1622,13 @@ button.buy-btn {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-6px); /* upward animation */
+    transform: translateY(-6px);
     transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 200;
-    max-height: 30vw; /* adjust */
+    max-height: 30vw;
     overflow-y: auto;
-    scrollbar-width: thin; /* Firefox */
-    scrollbar-color: rgba(255, 255, 255, 0.25) transparent; /* thumb + track */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
 
 .dropdown-menu::-webkit-scrollbar {
@@ -1691,27 +1639,23 @@ button.buy-btn {
     border-radius: 999px;
 }
 
-/* each option */
 .dropdown-item {
     padding: 0.55rem 0.8rem;
     color: #fff;
     font-size: 0.95rem;
-    background: rgba(0, 0, 0, 0); /* base transparent */
+    background: rgba(0, 0, 0, 0);
     cursor: pointer;
     transition: background 0.15s ease;
 }
 
-/* hover: grey, not blue */
 .dropdown-item:hover {
     background: rgba(255, 255, 255, 0.06);
 }
 
-/* selected state */
 .dropdown-item.is-selected {
     background: rgba(0, 0, 0, 0.35);
 }
 
-/* open state */
 .dropdown.open .dropdown-menu {
     opacity: 1;
     pointer-events: auto;

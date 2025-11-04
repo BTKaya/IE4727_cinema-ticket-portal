@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".timer-box").forEach(box => {
+    document.querySelectorAll(".timer-box").forEach((box) => {
         let remaining = parseInt(box.getAttribute("data-remaining"), 10);
         let textEl = box.querySelector(".timer-countdown");
 
@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         function updateTimer() {
             if (remaining <= 0) {
-                textEl.textContent = "Expired";
-                box.style.color = "#ff4f4f";
+                // textEl.textContent = "Expired";
+                // box.style.color = "#ff4f4f";
                 setTimeout(() => window.location.reload(), 1000);
                 return;
             }
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             let m = Math.floor(remaining / 60);
             let s = remaining % 60;
-            textEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+            textEl.textContent = `${m}:${s.toString().padStart(2, "0")}`;
             remaining--;
             setTimeout(updateTimer, 1000);
         }
