@@ -6,12 +6,11 @@ function buildEmailHTML($bookingData, $totalPriceAll) {
 
     $rowsHTML = "";
     foreach ($bookingData as $b) {
-        // Convert seats string -> array -> wrap 5 per line
-        $seatArray = explode(", ", $b['seats']);
-        $seatLines = array_chunk($seatArray, 5);
+        $seatString = is_array($b['seats']) ? implode(',', $b['seats']) : $b['seats'];
+        $seatArray = array_map('trim', explode(',', $seatString));
+        $seatLines = array_chunk($seatArray, 4);
         $seatsWrapped = implode("<br>", array_map(fn($chunk) => implode(", ", $chunk), $seatLines));
 
-        // Ensure time is trimmed to HH:MM format
         $time = substr($b['screening_time'], 0, 5);
 
         $rowsHTML .= "

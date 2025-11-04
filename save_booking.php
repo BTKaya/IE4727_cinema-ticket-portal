@@ -117,7 +117,7 @@ try {
     if ($current === "") {
         $updated = $seats;
     } else {
-        $existing = array_values(array_unique(array_filter(array_map('trim', explode(', ', $current)))));
+        $existing = array_values(array_unique(array_filter(array_map('trim', explode(',', $current)))));
         $updated = array_values(array_unique(array_merge($existing, $seats)));
     }
 

@@ -135,11 +135,6 @@ $rows = range('A', 'H');
         <th>Release Date:</th>
         <td><?= htmlspecialchars($movie['release_date']); ?></td>
       </tr>
-      <tr>
-        <th>Trailer:</th>
-        <td><a href="<?= htmlspecialchars($movie['trailer_url']); ?>" target="_blank" class="trailer-link">Watch on
-            YouTube</a></td>
-      </tr>
     </table>
   </div>
 
