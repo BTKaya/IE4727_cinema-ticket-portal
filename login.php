@@ -4,13 +4,11 @@ require __DIR__ . '/db.php';
 
 $errors = [];
 
-// capture redirect target from auth.php
 $redirect = $_GET['redirect'] ?? 'index.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $username = trim($_POST['username'] ?? '');
   $password = $_POST['password'] ?? '';
-  // preserve redirect target through POST
   $redirect = $_POST['redirect'] ?? $redirect;
 
   if ($username === '' || $password === '') {
@@ -24,8 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['user_id'] = $user['id'];
       $_SESSION['username'] = $user['username'];
 
-      // go back to where user wanted
-      header('Location: ' . $redirect);
+      header('Location: index.php');
       exit;
     } else {
       $errors[] = 'Username or password incorrect';
@@ -60,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form method="post">
-      <!-- keep redirect through POST -->
       <input type="hidden" name="redirect" value="<?= htmlspecialchars($redirect) ?>">
 
       <label>Username
