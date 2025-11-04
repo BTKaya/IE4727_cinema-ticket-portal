@@ -117,6 +117,7 @@ $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php foreach ($bookings as $b): ?>
           <input type="hidden" name="booking_ids[]" value="<?= (int) $b['id']; ?>">
         <?php endforeach; ?>
+        <button type="button" class="checkout-btn" onclick="window.location='movies.php'">Continue Browsing</button>
         <button type="submit" class="checkout-btn">Confirm Checkout</button>
       </form>
     </div>
