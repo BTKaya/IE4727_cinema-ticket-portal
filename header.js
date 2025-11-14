@@ -78,18 +78,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.getElementById("quickBuyToggle");
     const quickbuy = document.querySelector(".quickbuy-list");
 
-    if (!toggle || !quickbuy) return;
+    if (toggle && quickbuy) {
 
-    toggle.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation(); // so the document click below doesn't immediately close it
-        quickbuy.classList.toggle("active");
-    });
+        toggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation(); // so the document click below doesn't immediately close it
+            quickbuy.classList.toggle("active");
+        });
 
-    document.addEventListener("click", (e) => {
-        // clicked outside
-        if (!quickbuy.contains(e.target) && e.target !== toggle) {
-            quickbuy.classList.remove("active");
-        }
-    });
+        document.addEventListener("click", (e) => {
+            // clicked outside
+            if (!quickbuy.contains(e.target) && e.target !== toggle) {
+                quickbuy.classList.remove("active");
+            }
+        });
+    }
 });
