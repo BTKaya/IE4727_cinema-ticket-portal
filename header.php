@@ -1,5 +1,8 @@
 <!doctype html>
 <html>
+<?php
+include __DIR__ . "/run_daily_sessions.php";
+?>
 
 <head>
   <meta charset="UTF-8">
