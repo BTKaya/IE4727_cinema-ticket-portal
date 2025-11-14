@@ -6,15 +6,21 @@ document.addEventListener("DOMContentLoaded", () => {
         return DROPDOWNS[select.id];
     }
 
-    // rebuild menu for a given select
+    // rebuild menu for a given select (styling only, doesn't touch <option> set)
     function rebuildDropdownFromSelect(select) {
         const entry = getEntry(select);
         if (!entry) return;
         const { trigger, menu } = entry;
 
+        // Clear menu fully
+        while (menu.firstChild) {
+            menu.removeChild(menu.firstChild);
+        }
+
         // takes options from select and turns into dropdown items
-        menu.innerHTML = "";
         Array.from(select.options).forEach((opt) => {
+            if (opt.hidden) return; // in case you later hide any
+
             const item = document.createElement("div");
             item.className = "dropdown-item";
             item.textContent = opt.textContent;
@@ -31,6 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document
         .querySelectorAll("select.opened-list-styling")
         .forEach((select) => {
+            // prevent double-init
+            if (select.dataset.enhanced === "1") return;
+            select.dataset.enhanced = "1";
+
             const wrapper = document.createElement("div");
             wrapper.className = "dropdown";
 
@@ -86,57 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-    // dependent selects for quick buy form
-    (function () {
-        const movieSel = document.getElementById("movie");
-        const locSel = document.getElementById("location");
-        const showSel = document.getElementById("showtime");
-
-        function filterOptions(selectEl, pred) {
-            let any = false;
-            [...selectEl.options].forEach((opt, i) => {
-                if (i === 0) {
-                    opt.hidden = false;
-                    opt.disabled = false;
-                    return;
-                }
-                const keep = pred(opt);
-                opt.hidden = !keep;
-                opt.disabled = !keep;
-                if (keep) any = true;
-            });
-            selectEl.selectedIndex = 0;
-            selectEl.disabled = !any;
-
-            // keep custom UI in sync
-            rebuildDropdownFromSelect(selectEl);
-        }
-
-        movieSel.addEventListener("change", () => {
-            const mv = movieSel.value;
-            filterOptions(locSel, (opt) => mv && opt.dataset.movieId === mv);
-            filterOptions(showSel, () => false);
-        });
-
-        locSel.addEventListener("change", () => {
-            const mv = movieSel.value;
-            const loc = locSel.value;
-            filterOptions(
-                showSel,
-                (opt) =>
-                    mv &&
-                    loc &&
-                    opt.dataset.movieId === mv &&
-                    opt.dataset.locationId === loc
-            );
-        });
-
-        // disable until movie chosen
-        locSel.disabled = true;
-        showSel.disabled = true;
-        rebuildDropdownFromSelect(locSel);
-        rebuildDropdownFromSelect(showSel);
-    })();
+    // ❌ NO MORE dependent filtering of showtime/location
+    // We just use whatever options PHP printed once.
 
     // handle form submission
     const form = document.getElementById("quickBuyForm");
@@ -150,20 +111,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const movieId = movieSel.value;
             const locationId = locSel.value;
-            const sessionId = showSel.value;
+            const timeKey = showSel.value;
 
-            if (!movieId || !locationId || !sessionId) {
+            if (!movieId || !locationId || !timeKey) {
                 alert("Please select movie, location, and showtime.");
                 return;
             }
+
+            const [sessionDate, sessionTime] = timeKey.split("|");
 
             const url =
                 "movieDetail.php?id=" +
                 encodeURIComponent(movieId) +
                 "&location_id=" +
                 encodeURIComponent(locationId) +
-                "&session_id=" +
-                encodeURIComponent(sessionId);
+                "&date=" +
+                encodeURIComponent(sessionDate) +
+                "&time=" +
+                encodeURIComponent(sessionTime);
 
             window.location.href = url;
         });

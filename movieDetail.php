@@ -12,7 +12,7 @@ $layout = $movie['location_type'] ?? 1;
 
 $stmt2 = $pdo->query("SELECT id, name FROM locations ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
-// sessions for this movie
+// sessions for this movie (within 4 days, future only)
 $sessionsStmt = $pdo->prepare("
     SELECT id, session_date, session_time, location_id
     FROM sessions
@@ -28,72 +28,87 @@ $sessionsStmt = $pdo->prepare("
 $sessionsStmt->execute([$movie_id]);
 $sessions = $sessionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Build session lookup map
+// [movie_id][location_id][date][time] = session_id
+$sessionLookup = [];
+foreach ($sessions as $s) {
+    $date = $s['session_date'];
+    $time = substr($s['session_time'], 0, 5);
+    $loc  = $s['location_id'];
+
+    $sessionLookup[$movie_id][$loc][$date][$time] = $s['id'];
+}
+
+// Read optional session_id passed from QuickBuy
 $session_id = isset($_GET['session_id']) ? (int) $_GET['session_id'] : 0;
 
+// Lookup for location names
 $locationsById = [];
 foreach ($stmt2 as $loc) {
-  $locationsById[$loc['id']] = $loc['name'];
+    $locationsById[$loc['id']] = $loc['name'];
 }
 
 include 'header.php';
 include 'menu.php';
 
 if (!$movie) {
-  echo "<div class='movie-page'><p>Movie not found.</p></div>";
-  include 'footer.php';
-  exit;
+    echo "<div class='movie-page'><p>Movie not found.</p></div>";
+    include 'footer.php';
+    exit;
 }
 
+// Read date/time/location from GET (from QuickBuy)
 $date = $_GET['date'] ?? "";
 $time = $_GET['time'] ?? "";
 $location = $_GET['location'] ?? "";
 
 // Resolve location name from ID
 if ($location_id != 0 && isset($locationsById[$location_id])) {
-  $location = $locationsById[$location_id];
+    $location = $locationsById[$location_id];
 }
 
-// If session_id provided, pull authoritative data
+/* ============================================================
+   Resolve session ID from QuickBuy selection (date + time)
+   Only if session_id was NOT explicitly passed
+   ============================================================ */
+if (
+    !$session_id &&
+    $movie_id &&
+    $location_id &&
+    $date &&
+    $time &&
+    isset($sessionLookup[$movie_id][$location_id][$date][$time])
+) {
+    $session_id = $sessionLookup[$movie_id][$location_id][$date][$time];
+}
+
+/* ============================================================
+   If session_id IS provided (e.g., user came from schedule page),
+   Fetch authoritative session data
+   ============================================================ */
 if ($session_id) {
-  $sessStmt = $pdo->prepare("
-      SELECT movie_id, location_id, session_date, session_time
-      FROM sessions
-      WHERE id = ?
-      LIMIT 1
-  ");
-  $sessStmt->execute([$session_id]);
-  $sessRow = $sessStmt->fetch(PDO::FETCH_ASSOC);
-  if ($sessRow) {
-    $movie_id = (int) $sessRow['movie_id'];
-    $location_id = (int) $sessRow['location_id'];
-    $date = $sessRow['session_date'];
-    $time = substr($sessRow['session_time'], 0, 5);
-  }
+    $sessStmt = $pdo->prepare("
+        SELECT movie_id, location_id, session_date, session_time
+        FROM sessions
+        WHERE id = ?
+        LIMIT 1
+    ");
+    $sessStmt->execute([$session_id]);
+    $sessRow = $sessStmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($sessRow) {
+        $movie_id = (int) $sessRow['movie_id'];
+        $location_id = (int) $sessRow['location_id'];
+        $date = $sessRow['session_date'];
+        $time = substr($sessRow['session_time'], 0, 5);
+    }
 }
 
-if (!$session_id && $movie_id && $date && $time && $location_id) {
-  $sessStmt2 = $pdo->prepare("
-      SELECT id FROM sessions
-      WHERE movie_id = ?
-        AND location_id = ?
-        AND session_date = ?
-        AND (session_time = ? OR session_time LIKE CONCAT(?, ':__'))
-      LIMIT 1
-  ");
-  $sessStmt2->execute([$movie_id, $location_id, $date, $time, $time]);
-  $session_id = (int) ($sessStmt2->fetchColumn() ?: 0);
-}
-
-/* ======== Fetch booked seats from sessions.booked_seats ======== */
-function parseSeatList(string $s): array
-{
-  if ($s === '')
-    return [];
-  // no spaces expected; split and normalize
-  $arr = array_map('trim', explode(',', $s));
-  // de-dup + remove empties
-  $arr = array_values(array_unique(array_filter($arr, fn($x) => $x !== '')));
-  return $arr;
+/* ======== Fetch booked & held seats ======== */
+function parseSeatList(string $s): array {
+    if ($s === '') return [];
+    $arr = array_map('trim', explode(',', $s));
+    return array_values(array_unique(array_filter($arr, fn($x) => $x !== '')));
 }
 
 $bookedSeats = [];
@@ -101,16 +116,15 @@ $heldSeats = [];
 $unavailableSeats = [];
 
 if ($session_id > 0) {
-  $q = $pdo->prepare("SELECT booked_seats, held_seats FROM sessions WHERE id = ? LIMIT 1");
-  $q->execute([$session_id]);
-  $row = $q->fetch(PDO::FETCH_ASSOC);
+    $q = $pdo->prepare("SELECT booked_seats, held_seats FROM sessions WHERE id = ? LIMIT 1");
+    $q->execute([$session_id]);
+    $row = $q->fetch(PDO::FETCH_ASSOC);
 
-  $bookedSeats = parseSeatList($row['booked_seats'] ?? '');
-  $heldSeats = parseSeatList($row['held_seats'] ?? '');
+    $bookedSeats = parseSeatList($row['booked_seats'] ?? '');
+    $heldSeats = parseSeatList($row['held_seats'] ?? '');
 
-  $unavailableSeats = array_unique(array_merge($bookedSeats, $heldSeats));
+    $unavailableSeats = array_unique(array_merge($bookedSeats, $heldSeats));
 }
-
 
 $rows = range('A', 'H');
 ?>
@@ -121,26 +135,11 @@ $rows = range('A', 'H');
   <div class="movie-info">
     <img src="<?= htmlspecialchars($movie['poster']); ?>" alt="Poster" style="margin-top: 0.75rem;">
     <table class="movie-info-table">
-      <tr>
-        <th>Title:</th>
-        <td><?= htmlspecialchars($movie['title']); ?></td>
-      </tr>
-      <tr>
-        <th>Summary:</th>
-        <td><?= nl2br(htmlspecialchars($movie['summary'])); ?></td>
-      </tr>
-      <tr>
-        <th>Director:</th>
-        <td><?= htmlspecialchars($movie['director']); ?></td>
-      </tr>
-      <tr>
-        <th>Actors:</th>
-        <td><?= htmlspecialchars($movie['actors']); ?></td>
-      </tr>
-      <tr>
-        <th>Release Date:</th>
-        <td><?= htmlspecialchars($movie['release_date']); ?></td>
-      </tr>
+      <tr><th>Title:</th><td><?= htmlspecialchars($movie['title']); ?></td></tr>
+      <tr><th>Summary:</th><td><?= nl2br(htmlspecialchars($movie['summary'])); ?></td></tr>
+      <tr><th>Director:</th><td><?= htmlspecialchars($movie['director']); ?></td></tr>
+      <tr><th>Actors:</th><td><?= htmlspecialchars($movie['actors']); ?></td></tr>
+      <tr><th>Release Date:</th><td><?= htmlspecialchars($movie['release_date']); ?></td></tr>
     </table>
   </div>
 
@@ -153,10 +152,10 @@ $rows = range('A', 'H');
       <?php
       $uniqueDates = [];
       foreach ($sessions as $s) {
-        if (!in_array($s['session_date'], $uniqueDates)) {
-          $uniqueDates[] = $s['session_date'];
-          echo "<option value='{$s['session_date']}'>{$s['session_date']}</option>";
-        }
+          if (!in_array($s['session_date'], $uniqueDates)) {
+              $uniqueDates[] = $s['session_date'];
+              echo "<option value='{$s['session_date']}'>{$s['session_date']}</option>";
+          }
       }
       ?>
     </select>
@@ -166,8 +165,8 @@ $rows = range('A', 'H');
       <option value="">-- Select --</option>
       <?php
       foreach ($sessions as $s) {
-        $timeShort = substr($s['session_time'], 0, 5);
-        echo "<option value='{$timeShort}' data-date='{$s['session_date']}' data-loc='{$s['location_id']}'>{$timeShort}</option>";
+          $timeShort = substr($s['session_time'], 0, 5);
+          echo "<option value='{$timeShort}' data-date='{$s['session_date']}' data-loc='{$s['location_id']}'>{$timeShort}</option>";
       }
       ?>
     </select>
@@ -177,7 +176,7 @@ $rows = range('A', 'H');
       <option value="">-- Select --</option>
       <?php
       foreach ($locationsById as $id => $name) {
-        echo "<option value='{$id}'>{$name}</option>";
+          echo "<option value='{$id}'>{$name}</option>";
       }
       ?>
     </select>
@@ -195,14 +194,14 @@ $rows = range('A', 'H');
           <?php
           $seats = ($layout == 1) ? range(1, 8) : range(1, 10);
           foreach ($seats as $i):
-            $seat_id = $r . $i;
-            $class = in_array($seat_id, $unavailableSeats) ? "seat booked" : "seat available";
-            echo "<div class='$class' data-seat='$seat_id'></div>";
+              $seat_id = $r . $i;
+              $class = in_array($seat_id, $unavailableSeats) ? "seat booked" : "seat available";
+              echo "<div class='$class' data-seat='$seat_id'></div>";
 
-            if ($layout == 1 && in_array($i, [2, 4, 6]))
-              echo "<div class='aisle-gap'></div>";
-            if ($layout == 2 && in_array($i, [2, 8]))
-              echo "<div class='aisle-gap'></div>";
+              if ($layout == 1 && in_array($i, [2, 4, 6]))
+                  echo "<div class='aisle-gap'></div>";
+              if ($layout == 2 && in_array($i, [2, 8]))
+                  echo "<div class='aisle-gap'></div>";
           endforeach;
           ?>
         </div>
@@ -210,15 +209,9 @@ $rows = range('A', 'H');
     </div>
 
     <div class="seat-legend">
-      <div class="legend-item">
-        <div class="seat available static"></div><span>Available</span>
-      </div>
-      <div class="legend-item">
-        <div class="seat selected static"></div><span>Selected</span>
-      </div>
-      <div class="legend-item">
-        <div class="seat booked static"></div><span>Booked</span>
-      </div>
+      <div class="legend-item"><div class="seat available static"></div><span>Available</span></div>
+      <div class="legend-item"><div class="seat selected static"></div><span>Selected</span></div>
+      <div class="legend-item"><div class="seat booked static"></div><span>Booked</span></div>
     </div>
 
     <div class="selected-summary">

@@ -105,31 +105,71 @@ foreach ($sessions as $s) {
           </select>
 
           <label for="location">Location:</label>
-          <select id="location" name="location_id" class="opened-list-styling" required disabled>
+          <select id="location" name="location_id" class="opened-list-styling" required>
             <option value="">Select a cinema</option>
-            <?php
-            // Ensure unique movie-location pairs
-            $seen = [];
-            foreach ($sessions as $s):
-              $key = $s['movie_id'] . '-' . $s['location_id'];
-              if (isset($seen[$key]))
-                continue;
-              $seen[$key] = true;
-              ?>
-              <option value="<?= (int) $s['location_id'] ?>" data-movie-id="<?= (int) $s['movie_id'] ?>">
-                <?= htmlspecialchars($s['location_name']) ?>
+            <?php foreach ($locations as $loc): ?>
+              <option value="<?= (int)$loc['id'] ?>">
+                  <?= htmlspecialchars($loc['name']) ?>
               </option>
             <?php endforeach; ?>
-          </select>
+          </select> 
 
           <label for="showtime">Showtime:</label>
-          <select id="showtime" name="session_id" class="opened-list-styling" required disabled>
+
+          <?php
+          // Build lookup for correct session_id selection later
+          $sessionLookup = []; // [movie_id][location_id][date][time] = session_id
+
+          foreach ($sessions as $s) {
+              $date = $s['session_date'];
+              $time = $s['session_time'];
+              $movie = $s['movie_id'];
+              $loc = $s['location_id'];
+
+              $sessionLookup[$movie][$loc][$date][$time] = $s['session_id'];
+          }
+          ?>
+
+          <?php
+          $today   = new DateTime("today");
+          $now     = new DateTime();             // current datetime
+          $maxDay  = (clone $today)->modify("+4 days");
+
+          $filteredSessions = [];
+
+          foreach ($sessions as $s) {
+              $sessionDate = new DateTime($s['session_date']);
+              $sessionDT   = new DateTime($s['session_date'] . " " . $s['session_time']);
+              if ($sessionDate < $today) continue; // skip past dates
+              if ($sessionDate == $today && $sessionDT < $now) continue; // skip past times on today's date
+              if ($sessionDate > $maxDay) continue; // skip sessions more than 4 days ahead
+
+              $filteredSessions[] = $s;
+          }
+          ?>
+
+          <?php
+          // Remove duplicate date/time entries
+          $uniqueCheck = [];
+          $uniqueTimes = [];
+
+          foreach ($filteredSessions as $s) {
+              $key = $s['session_date'] . '-' . $s['session_time'];
+
+              if (!isset($uniqueCheck[$key])) {
+                  $uniqueCheck[$key] = true;
+                  $uniqueTimes[] = $s;
+              }
+          }
+          ?>
+
+          <select id="showtime" name="time_key" class="opened-list-styling" required>
             <option value="">Select a showtime</option>
-            <?php foreach ($sessions as $s): ?>
-              <option value="<?= (int) $s['session_id'] ?>" data-movie-id="<?= (int) $s['movie_id'] ?>"
-                data-location-id="<?= (int) $s['location_id'] ?>">
-                <?= htmlspecialchars($s['session_date']) ?> @ <?= htmlspecialchars($s['session_time']) ?>
-              </option>
+            <?php foreach ($uniqueTimes as $s): ?>
+                <?php $key = $s['session_date'] . '|' . $s['session_time']; ?>
+                <option value="<?= $key ?>">
+                    <?= htmlspecialchars($s['session_date']) ?> @ <?= htmlspecialchars($s['session_time']) ?>
+                </option>
             <?php endforeach; ?>
           </select>
 
