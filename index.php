@@ -137,6 +137,7 @@ foreach ($sessions as $s) {
         </form>
       </div>
     </aside>
+    <div id="quickbuy-overlay" class="quickbuy-overlay"></div>
   </main>
 
   <script src="quickbuy.js" defer></script>

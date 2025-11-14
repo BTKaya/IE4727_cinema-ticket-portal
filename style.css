@@ -1398,7 +1398,7 @@ option:hover {
     position: absolute;
     bottom: 8%;
     right: 3.5%;
-    z-index: 110;
+    z-index: 300;
 }
 
 #quickbuy {
@@ -1457,6 +1457,7 @@ option:hover {
     color: #fff;
     padding: 0.5rem 0;
     width: 300px;
+    z-index: 210;
 }
 
 .quickbuy-list.active .quickbuy-text {
@@ -1531,12 +1532,12 @@ button.buy-btn {
     transform: scale(1.1);
 }
 
-/* Ensure Quick Buy never appears above side navigation */
+/* Ensure Quick Buy never appears above side navigation
 .quickbuy-list,
 .quickbuy-text,
 .quickbuy-container {
     z-index: 50 !important;
-}
+} */
 
 
 .buy-btn {
@@ -2111,3 +2112,64 @@ button.buy-btn {
         font-size: 0.95rem;
     }
 }
+
+/* Dark overlay behind Quick Buy dropdown */
+.quickbuy-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 200; /* below header (50-120) but above page */
+}
+
+.quickbuy-list.active ~ .quickbuy-overlay {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.quickbuy-container {
+    position: absolute;
+    z-index: 310;         /* highest */
+}
+
+.quickbuy-overlay {
+    backdrop-filter: blur(3px);
+}
+
+
+/* Mobile fix for account buttons */
+@media (max-width: 600px) {
+    .account-actions {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .account-actions .btn {
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+        font-size: 1.05rem;
+    }
+}
+
+/* Mobile fix for timer box */
+@media (max-width: 600px) {
+    .timer-box {
+        float: none;
+        margin: 0 auto 10px auto;
+        padding: 10px 18px;
+        font-size: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .timer-countdown {
+        font-size: 1rem;
+        min-width: 50px;
+    }
+}
+
