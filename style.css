@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
 
+/* ROOT, GLOBAL RESET & BASE*/
 :root {
     --header-h: 70px;
     --text: #ffffff;
@@ -35,7 +36,7 @@ option:hover {
     color: #fff;
 }
 
-/* ================= HEADER ================= */
+/*HEADER / NAV / SEARCH*/
 .site-logo {
     display: inline-block;
     height: 50px;
@@ -126,6 +127,33 @@ option:hover {
     cursor: pointer;
 }
 
+#menuBtn {
+    transition: transform 0.25s ease;
+    transform-origin: center center;
+}
+
+#menuBtn:hover {
+    transform: scale(1.35) rotate(180deg);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+    transition: transform 0.25s ease;
+    text-decoration: none;
+}
+
+.icon-btn:hover {
+    transform: scale(1.35) rotate(-90deg);
+}
+
+/*Side Panel*/
 .panel-overlay {
     position: fixed;
     inset: 0;
@@ -133,7 +161,12 @@ option:hover {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
-    z-index: 98;
+    z-index: 490 !important;
+}
+
+.panel-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .side-panel {
@@ -146,11 +179,15 @@ option:hover {
     color: var(--text, #fff);
     transform: translateX(-100%);
     transition: transform 0.25s ease;
-    z-index: 99;
+    z-index: 500 !important;
     display: flex;
     flex-direction: column;
     border-right: 1px solid #222;
     box-shadow: 2px 0 14px rgba(0, 0, 0, 0.35);
+}
+
+.side-panel.is-open {
+    transform: translateX(0);
 }
 
 .side-panel__head {
@@ -192,57 +229,25 @@ option:hover {
     opacity: 0.85;
     transition: opacity 0.15s ease, transform 0.15s ease;
 }
+
 .side-panel__body a:hover {
     opacity: 1;
     transform: translateX(20px);
-}
-
-.side-panel.is-open {
-    transform: translateX(0);
-}
-.panel-overlay.is-open {
-    opacity: 1;
-    pointer-events: auto;
 }
 
 .body-locked {
     overflow: hidden;
 }
 
-#menuBtn {
-    transition: transform 0.25s ease;
-    transform-origin: center center;
-}
-
-#menuBtn:hover {
-    transform: scale(1.35) rotate(180deg);
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.4rem;
-    transition: transform 0.25s ease;
-    text-decoration: none;
-}
-
-.icon-btn:hover {
-    transform: scale(1.35) rotate(-90deg);
-}
-
+/*Search Overlay + Bar*/
 .search-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.6);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
-    z-index: 90; /* above header (50) */
+    z-index: 110; /* above header (50), below search bar (120) */
+    transition: opacity 0.3s ease;
 }
 
 .search-overlay.show {
@@ -250,7 +255,6 @@ option:hover {
     pointer-events: auto;
 }
 
-/* floating search bar */
 .searchbar {
     position: fixed;
     top: 0;
@@ -270,7 +274,6 @@ option:hover {
     transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
-/* show state: drop below the fixed header */
 .searchbar.show {
     opacity: 1;
     transform: translate(-50%, calc(var(--header-h) + 10px)) scale(1);
@@ -298,28 +301,11 @@ option:hover {
     opacity: 1;
 }
 
-/* dark overlay behind */
-.search-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 110;
-    transition: opacity 0.3s ease;
-}
-
-.search-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* ================= HERO / SLIDESHOW ================= */
+/*HERO / SLIDESHOW / INDEX TOP*/
 .hero-wrap {
     position: relative;
-    height: calc(100vh);
+    height: 100vh;
     width: 100%;
-
     overflow: hidden;
 }
 
@@ -331,7 +317,7 @@ option:hover {
     z-index: 1;
 }
 
-/* === FADE SLIDESHOW IMAGES === */
+/* Fading slideshow images */
 .slideshow-image {
     position: absolute;
     inset: 0;
@@ -350,7 +336,7 @@ option:hover {
     opacity: 1;
 }
 
-/* DARK FADE */
+/* Dark overlay fades over hero */
 .hero-wrap::before {
     content: "";
     position: absolute;
@@ -377,7 +363,7 @@ option:hover {
     pointer-events: none;
 }
 
-/* ================= MOVIE LIST BOTTOM LEFT ================= */
+/*POPULAR LIST / SUMMARY BOX*/
 .popular-list {
     position: absolute;
     bottom: 10%;
@@ -421,7 +407,6 @@ option:hover {
     width: 100%;
 }
 
-/* ================= SUMMARY BOX ================= */
 .movie-summary-box {
     position: absolute;
     left: 5%;
@@ -454,7 +439,7 @@ option:hover {
     color: #e6e6e6;
 }
 
-/* ================= MOVIE GRID UNDER SLIDESHOW ================= */
+/*INDEX MOVIE GRID*/
 .movies-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -483,9 +468,10 @@ option:hover {
 .movie-card h3 {
     margin-top: 0.5rem;
     color: white;
+    font-size: 1.1rem;
 }
 
-/* ================= FOOTER ================= */
+/*FOOTER*/
 .site-footer {
     text-align: center;
     padding: 1.2rem;
@@ -494,9 +480,7 @@ option:hover {
     color: var(--dim);
 }
 
-/* =============================================
-   Movie Details
-   ============================================= */
+/*MOVIE DETAIL PAGE*/
 .movie-page {
     margin-top: var(--header-h);
     padding: 2rem;
@@ -512,41 +496,6 @@ option:hover {
 .movie-page * {
     position: relative;
     z-index: 10;
-}
-
-/* restore seat map display */
-.seat-container {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: center;
-    margin-top: 1.5rem;
-}
-
-.seat-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 6px;
-}
-
-.row-label {
-    width: 20px;
-    margin-right: 10px;
-    text-align: right;
-}
-
-.aisle-gap {
-    width: 16px;
-    display: inline-block;
-}
-
-.movie-page {
-    margin-top: var(--header-h);
-    padding: 2rem;
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-    color: white;
 }
 
 .movie-info {
@@ -610,7 +559,7 @@ option:hover {
     transform: translateY(0);
 }
 
-/* ===== CART PAGE ===== */
+/*CART PAGE / TIMER*/
 .cart-page {
     margin-top: var(--header-h);
     padding: 2.5rem;
@@ -631,7 +580,6 @@ option:hover {
     margin-top: 2rem;
 }
 
-/* Booking Cards */
 .booking-card {
     background: #111;
     border: 1px solid #333;
@@ -647,7 +595,6 @@ option:hover {
     border-color: #888;
 }
 
-/* Total Price */
 .booking-card .price {
     margin-top: 8px;
     font-size: 1.1rem;
@@ -668,7 +615,6 @@ option:hover {
     background: #d24a4a;
 }
 
-/* Checkout Button */
 .confirm-checkout-wrap {
     text-align: center;
     margin-top: 2.2rem;
@@ -691,34 +637,30 @@ option:hover {
     transform: translateY(-3px);
 }
 
-/* ================= CONFIRM BUTTON STYLING ================= */
-.confirm-btn {
-    background: #ffffff10;
-    border: 2px solid #ffffff50;
-    color: white;
-    padding: 12px 28px;
+/* Timer */
+.timer-box {
+    float: right;
+    background: #111;
+    padding: 6px 12px;
     border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    border: 1px solid #444;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.5s ease;
+}
+
+.timer-countdown {
+    font-weight: 700;
+    min-width: 40px;
     display: inline-block;
-    transition: background 0.25s ease, border-color 0.25s ease,
-        transform 0.25s ease;
+    text-align: center;
+    transition: color 0.5s ease;
 }
 
-.confirm-btn:hover {
-    background: #ffffff25;
-    border-color: #ffffff90;
-    transform: translateY(-2px);
-}
-
-.confirm-btn:active {
-    background: #ffffff35;
-    transform: translateY(0);
-}
-
-/* ================= SEAT MAP ================= */
+/*SEAT MAP*/
 .seat-container {
     display: flex;
     flex-direction: column;
@@ -745,8 +687,7 @@ option:hover {
     height: 30px;
     border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.25s ease, box-shadow 0.25s ease,
-        background 0.25s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
     border: none;
     background: #333;
     display: inline-block;
@@ -806,12 +747,11 @@ option:hover {
     gap: 8px;
 }
 
-/* ===== "SCREEN" Label ===== */
 .screen-label {
     text-align: center;
     font-size: 1.1rem;
     letter-spacing: 6px;
-    margin: 1.5rem 0 1.5rem 0;
+    margin: 1.5rem 0;
     padding-bottom: 0.5rem;
     color: #bbb;
     position: relative;
@@ -828,6 +768,7 @@ option:hover {
     background: linear-gradient(to right, transparent, #666, transparent);
 }
 
+/*Confirmation button*/
 .confirm-wrap {
     display: flex;
     justify-content: center;
@@ -843,6 +784,8 @@ option:hover {
     font-size: 1.15rem;
     font-weight: 600;
     cursor: pointer;
+    margin-top: 1.5rem;
+    display: inline-block;
     transition: background 0.25s ease, border-color 0.25s ease,
         transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -859,6 +802,7 @@ option:hover {
     background: #ffffff35;
 }
 
+/*Select row under detail page*/
 .dateTimeLocation-select {
     display: flex;
     justify-content: center;
@@ -903,7 +847,7 @@ option:hover {
     font-weight: 600;
 }
 
-/* ================= Movies ================= */
+/*MOVIES LIST PAGE*/
 .movies-page {
     margin-top: var(--header-h, 70px);
     padding: 2.5rem 3vw 3.5rem;
@@ -939,6 +883,7 @@ option:hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
 }
+
 .movie-card-page:hover {
     transform: translateY(-10px);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
@@ -990,20 +935,14 @@ option:hover {
     font-size: 0.8rem;
     transition: background 0.2s ease, border 0.2s ease;
 }
+
 .btn-sessions:hover,
 .btn-details:hover {
     background: #fff3;
     border-color: #fff;
 }
 
-/* small screens */
-@media (max-width: 600px) {
-    .movies-page {
-        padding-inline: 1rem;
-    }
-}
-
-/* ================= Locations ================= */
+/*LOCATIONS PAGE*/
 .locations-page {
     margin-top: var(--header-h, 70px);
     padding: 2.5rem 3vw 3.5rem;
@@ -1042,7 +981,7 @@ option:hover {
 
 .location-row:hover {
     transform: translateX(10px);
-    box-shadow: 0 10px 26px rgb(255, 50, 50, 0.3);
+    box-shadow: 0 10px 26px rgba(255, 50, 50, 0.3);
 }
 
 .location-picture {
@@ -1056,6 +995,7 @@ option:hover {
     align-items: center;
     justify-content: center;
 }
+
 .location-picture img {
     width: 100%;
     height: 100%;
@@ -1101,25 +1041,14 @@ option:hover {
     font-weight: 500;
     transition: background 0.2s ease, border 0.2s ease, transform 0.2s ease;
 }
+
 .btn-view-sessions:hover {
     background: #ffffff22;
     border-color: #fff;
     transform: translateY(-1px);
 }
 
-/* responsive */
-@media (max-width: 700px) {
-    .location-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .location-picture {
-        width: 100%;
-        height: 180px;
-    }
-}
-
-/* ================= AUTH PAGES (Login / Register) ================= */
+/*AUTH PAGES*/
 .auth-container {
     background: var(--bg2);
     color: var(--text);
@@ -1214,7 +1143,7 @@ option:hover {
     margin-bottom: 0.3rem;
 }
 
-/* ================= Account ================= */
+/*ACCOUNT PAGE*/
 .account-wrapper {
     margin-top: calc(var(--header-h) + 30px);
     padding: 2rem 1rem;
@@ -1297,7 +1226,7 @@ option:hover {
     transform: translateY(-2px);
 }
 
-/* fade in animation */
+/*fade in animation*/
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -1309,7 +1238,7 @@ option:hover {
     }
 }
 
-/* ================= POPUP OVERLAY ================= */
+/*POPUP OVERLAY*/
 .popup-overlay {
     position: fixed;
     inset: 0;
@@ -1393,12 +1322,12 @@ option:hover {
     }
 }
 
-/* ================= Quick Buy ================= */
+/*QUICK BUY WIDGET*/
 .quickbuy-list {
     position: absolute;
     bottom: 8%;
     right: 3.5%;
-    z-index: 110;
+    z-index: 300;
 }
 
 #quickbuy {
@@ -1457,6 +1386,7 @@ option:hover {
     color: #fff;
     padding: 0.5rem 0;
     width: 300px;
+    z-index: 310;
 }
 
 .quickbuy-list.active .quickbuy-text {
@@ -1492,10 +1422,9 @@ option:hover {
     font-size: 1rem;
     padding: 0.7rem 0.7rem;
     outline: none;
-    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease,
-        transform 0.25s ease;
+    transition: background 0.25s ease, color 0.25s ease,
+        box-shadow 0.25s ease, transform 0.25s ease;
     cursor: pointer;
-
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 10 6'%3E%3Cpath fill='white' d='M0 0l5 6 5-6H0z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.9rem center;
@@ -1512,13 +1441,9 @@ option:hover {
     font-size: 1rem;
     padding: 0.7rem 1.7rem 0.7rem 0.7rem;
     outline: none;
-    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease,
-        transform 0.25s ease;
+    transition: background 0.25s ease, color 0.25s ease,
+        box-shadow 0.25s ease, transform 0.25s ease;
     cursor: pointer;
-}
-
-button.buy-btn {
-    padding: 0.7rem 1rem;
 }
 
 .quickbuy-container select.open {
@@ -1531,6 +1456,7 @@ button.buy-btn {
     transform: scale(1.1);
 }
 
+/*Buy button inside QuickBuy*/
 .buy-btn {
     display: inline-block;
     align-self: flex-end;
@@ -1567,6 +1493,7 @@ button.buy-btn {
     width: 100%;
 }
 
+/*Native <select> visually hidden*/
 .visually-hidden-select {
     position: absolute;
     opacity: 0;
@@ -1575,6 +1502,7 @@ button.buy-btn {
     width: 0;
 }
 
+/*Custom dropdown*/
 .dropdown {
     position: relative;
     display: inline-block;
@@ -1634,6 +1562,7 @@ button.buy-btn {
 .dropdown-menu::-webkit-scrollbar {
     width: 6px;
 }
+
 .dropdown-menu::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.25);
     border-radius: 999px;
@@ -1666,24 +1595,354 @@ button.buy-btn {
     transform: translateY(-50%) rotate(180deg);
 }
 
-.timer-box {
-    float: right;
-    background: #111;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    margin-bottom: 8px;
-    border: 1px solid #444;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: color 0.5s ease;
+/*QuickBuy backdrop overlay*/
+.quickbuy-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 200; /*below QuickBuy (300), above most content*/
+    backdrop-filter: blur(3px);
 }
 
-.timer-countdown {
-    font-weight: 700;
-    min-width: 40px;
-    display: inline-block;
-    text-align: center;
-    transition: color 0.5s ease;
+.quickbuy-list.active ~ .quickbuy-overlay {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/*RESPONSIVE QUERIES*/
+
+/*Tablet (max-width: 992px)*/
+@media (max-width: 992px) {
+
+    /*Index movie grid*/
+    .movies-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.8rem;
+        padding: 2rem 1.5rem;
+    }
+
+    .movie-card img {
+        border-radius: 8px;
+    }
+
+    .movie-card h3 {
+        font-size: 1rem;
+    }
+
+    .movie-name {
+        font-size: calc(14px + 2.5vw);
+    }
+
+    .movie-summary-box {
+        width: 320px;
+        padding: 18px 22px;
+    }
+
+    /*QuickBuy text scaling*/
+    .quickbuy-text {
+        font-size: 1.4rem;
+    }
+
+    /*Movie info stacking*/
+    .movie-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .movie-info img {
+        width: 60%;
+        max-width: 260px;
+        margin-bottom: 1rem;
+    }
+
+    .movie-info-table th,
+    .movie-info-table td {
+        font-size: 0.95rem;
+        padding: 0.3rem 0.4rem;
+        text-align: center;
+    }
+
+    .movie-info p {
+        font-size: 0.95rem;
+    }
+
+    /*Seat map scale*/
+    .seat-container {
+        transform: scale(0.9);
+        transform-origin: top center;
+    }
+
+    /*Movies grid page*/
+    .movies-grid-page {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.5rem;
+    }
+
+    .movie-card-page {
+        max-height: none;
+        min-height: auto;
+    }
+
+    .movie-card-page-summary {
+        display: none;
+    }
+}
+
+/*Mobile (max-width: 600px)*/
+@media (max-width: 600px) {
+
+    /*Index grid*/
+    .movies-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+        padding: 1.2rem;
+    }
+
+    .movie-card img {
+        border-radius: 8px;
+    }
+
+    .movie-card h3 {
+        font-size: 0.9rem;
+        line-height: 1.2;
+    }
+
+    .movie-name {
+        font-size: calc(12px + 4vw);
+    }
+
+    .movie-summary-box {
+        position: static;
+        width: 100%;
+        max-width: 90%;
+        margin: 1rem auto 0;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .popular-list {
+        bottom: 12%;
+        left: 5%;
+    }
+
+    /*Movies page padding*/
+    .movies-page {
+        padding-inline: 1rem;
+    }
+
+    /*QuickBuy text & panel*/
+    .quickbuy-text {
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .quickbuy-container {
+        transform: scale(0.8);
+        transform-origin: top right;
+        width: 260px;
+        right: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .quickbuy-container select,
+    .quickbuy-container input,
+    .quickbuy-container button {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.6rem;
+    }
+
+    .quickbuy-container label {
+        font-size: 0.85rem;
+    }
+
+    .buy-btn {
+        font-size: 1rem;
+    }
+
+    /*Movie info compact*/
+    .movie-info img {
+        width: 75%;
+        max-width: 220px;
+    }
+
+    .movie-info-table th,
+    .movie-info-table td {
+        font-size: 0.85rem;
+    }
+
+    .movie-info {
+        gap: 0.6rem;
+        padding: 0 0.5rem;
+    }
+
+    .movie-info p {
+        font-size: 0.85rem;
+        line-height: 1.35;
+    }
+
+    .movie-info-table {
+        width: 95%;
+        margin: 0 auto;
+    }
+
+    .movie-info-table th,
+    .movie-info-table td {
+        display: block;
+        text-align: left;
+        font-size: 0.9rem;
+        padding: 0.3rem 0;
+    }
+
+    .movie-info-table th {
+        font-weight: 600;
+        margin-top: 0.6rem;
+    }
+
+    /*Seat container scale*/
+    .seat-container {
+        transform: scale(0.75);
+        transform-origin: top center;
+        margin-top: 1rem;
+    }
+
+    .screen-label {
+        font-size: 0.9rem;
+        letter-spacing: 4px;
+    }
+
+    /*Date/Time/Location row stacking*/
+    .dateTimeLocation-select {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        padding: 0 1rem;
+        gap: 0.9rem;
+        text-align: left;
+    }
+
+    .dateTimeLocation-select input,
+    .dateTimeLocation-select select {
+        width: 100%;
+        font-size: 1rem;
+        padding: 0.8rem 1rem;
+    }
+
+    /*Movies grid page down to 1 column*/
+    .movies-grid-page {
+        grid-template-columns: 1fr !important;
+        gap: 1.2rem;
+    }
+
+    .movie-card-page {
+        max-height: none;
+        min-height: auto;
+        border-radius: 10px;
+    }
+
+    .movie-card-page-title {
+        font-size: 1rem;
+    }
+
+    .movie-card-page-summary {
+        display: none;
+    }
+
+    /*Account page buttons vertical*/
+    .account-actions {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .account-actions .btn {
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+        font-size: 1.05rem;
+    }
+
+    /*Timer box center*/
+    .timer-box {
+        float: none;
+        margin: 0 auto 10px auto;
+        padding: 10px 18px;
+        font-size: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .timer-countdown {
+        font-size: 1rem;
+        min-width: 50px;
+    }
+}
+
+/*Very small phones (max-width: 420px)*/
+@media (max-width: 420px) {
+
+    .movies-grid {
+        padding: 1rem 0.8rem;
+        gap: 0.9rem;
+    }
+
+    .movie-card h3 {
+        font-size: 0.8rem;
+        line-height: 1.15;
+    }
+
+    .movie-name {
+        font-size: calc(10px + 4.5vw);
+    }
+
+    /*QuickBuy container smaller*/
+    .quickbuy-container {
+        transform: scale(0.7);
+        width: 240px;
+        right: 0.5rem;
+    }
+
+    /*Movie info image & table smaller*/
+    .movie-info img {
+        width: 90%;
+        max-width: 200px;
+    }
+
+    .movie-info-table th,
+    .movie-info-table td {
+        font-size: 0.78rem;
+    }
+
+    /*Seat map*/
+    .seat-container {
+        transform: scale(0.65);
+    }
+
+    .screen-label {
+        font-size: 0.8rem;
+        letter-spacing: 3px;
+    }
+
+    /*DateTime selects*/
+    .dateTimeLocation-select input,
+    .dateTimeLocation-select select {
+        font-size: 0.95rem;
+        padding: 0.75rem 0.9rem;
+    }
+
+    /*Movies grid page spacing*/
+    .movies-grid-page {
+        gap: 1rem;
+    }
+
+    .movie-card-page-title {
+        font-size: 0.95rem;
+    }
 }
