@@ -96,9 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-    // ❌ NO MORE dependent filtering of showtime/location
-    // We just use whatever options PHP printed once.
-
     // handle form submission
     const form = document.getElementById("quickBuyForm");
     if (form) {
