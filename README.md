@@ -1,5 +1,6 @@
 # Cinema Ticket Booking Web Portal
 
+## Project Overview
 A full-stack web application for online cinema ticket booking, developed collaboratively as part of a semester-long university project. This project demonstrates front-end and back-end development without external frameworks, including dynamic seat selection, shopping cart functionality, and email ticketing.
 
 ## Features
@@ -35,22 +36,20 @@ cd IE4727_cinema-ticket-portal
 
 ## Screenshots / Demo
 
-Home Page
+### Home Page (GIF)
 ![Lumina Home Page](https://github.com/user-attachments/assets/9e665023-73ad-4eda-a810-c29fd7e39c14)
 
-Movie Booking
+### Movie Booking (GIF)
 ![Movie Booking](https://github.com/user-attachments/assets/bca6c52a-f05b-4197-ad37-491784c87a10)
 
-
-Ticket Example
+### Ticket Example
 <img width="936" height="486" alt="Ticket Example" src="https://github.com/user-attachments/assets/1510ba87-0eb7-4db2-b7a4-cc0cf6103343" />
 
-
-Receipt Example
+###Receipt Example
 <img width="490" height="585" alt="Receipt Example" src="https://github.com/user-attachments/assets/8930ec1b-6624-464a-8d65-e89e5665714c" />
 
 ## Contribution / Credits
 This project was collaboratively developed with Nepexe (https://github.com/Nepexe), with contributions to both front-end and back-end functionality.
 
 ## License
-This project is for educational purposes.
+This project is provided for educational and portfolio purposes only.
