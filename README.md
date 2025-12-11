@@ -23,7 +23,7 @@ A full-stack web application for online cinema ticket booking, developed collabo
 1. Clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/IE4727_cinema-ticket-portal.git
+git clone https://github.com/BTKaya/IE4727_cinema-ticket-portal.git
 cd IE4727_cinema-ticket-portal
 ```
 
