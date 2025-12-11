@@ -1,7 +1,5 @@
 # Cinema Ticket Booking Web Portal
 
-This project was collaboratively developed with Nepexe (https://github.com/Nepexe), with contributions to both front-end and back-end functionality.
-
 A full-stack web application for online cinema ticket booking, developed collaboratively as part of a semester-long university project. This project demonstrates front-end and back-end development without external frameworks, including dynamic seat selection, shopping cart functionality, and email ticketing.
 
 ## Features
@@ -31,4 +29,14 @@ cd IE4727_cinema-ticket-portal
 
 2. Set up a local server environment (e.g., XAMPP as used for this project)
 3. Import the provided database.sql file into your MySQL server to create the required database and tables
-4. Update
+4. Update db.php with your MySQL credentials.
+5. Start your local server and navigate to http://localhost/IE4727_cinema-ticket-portal in your browser.
+6. Register a new account to start booking.
+
+## Screenshots / Demo
+
+## Contribution / Credits
+This project was collaboratively developed with Nepexe (https://github.com/Nepexe), with contributions to both front-end and back-end functionality.
+
+## License
+This project is for educational purposes.
