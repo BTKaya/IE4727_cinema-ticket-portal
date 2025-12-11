@@ -30,7 +30,7 @@ cd IE4727_cinema-ticket-portal
 2. Set up a local server environment (e.g., XAMPP as used for this project)
 3. Import the provided database.sql file into your MySQL server to create the required database and tables
 4. Update db.php with your MySQL credentials.
-5. Start your local server and navigate to http://localhost/IE4727_cinema-ticket-portal in your browser.
+5. Start your local server and navigate to [http://localhost/IE4727_cinema-ticket-portal](http://localhost/IE4727_cinema-ticket-portal) in your browser.
 6. Register a new account to start booking.
 
 ## Screenshots / Demo
