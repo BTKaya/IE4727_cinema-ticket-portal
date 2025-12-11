@@ -41,6 +41,14 @@ Home Page
 Movie Booking
 ![Movie Booking](https://github.com/user-attachments/assets/bca6c52a-f05b-4197-ad37-491784c87a10)
 
+
+Ticket Example
+<img width="936" height="486" alt="Ticket Example" src="https://github.com/user-attachments/assets/1510ba87-0eb7-4db2-b7a4-cc0cf6103343" />
+
+
+Receipt Example
+<img width="490" height="585" alt="Receipt Example" src="https://github.com/user-attachments/assets/8930ec1b-6624-464a-8d65-e89e5665714c" />
+
 ## Contribution / Credits
 This project was collaboratively developed with Nepexe (https://github.com/Nepexe), with contributions to both front-end and back-end functionality.
 
