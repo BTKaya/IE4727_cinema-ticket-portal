@@ -35,6 +35,12 @@ cd IE4727_cinema-ticket-portal
 
 ## Screenshots / Demo
 
+Home Page
+![Lumina Home Page](https://github.com/user-attachments/assets/9e665023-73ad-4eda-a810-c29fd7e39c14)
+
+Movie Booking
+![Movie Booking](https://github.com/user-attachments/assets/bca6c52a-f05b-4197-ad37-491784c87a10)
+
 ## Contribution / Credits
 This project was collaboratively developed with Nepexe (https://github.com/Nepexe), with contributions to both front-end and back-end functionality.
 
